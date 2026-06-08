@@ -1,20 +1,44 @@
-import {escapeHtml, escapeHtmlAttr} from './sanitize.js';
+import assert from "node:assert/strict";
+import test from "node:test";
 
-console.assert(escapeHtml('<img>') === '&lt;img&gt;', 'escapeHtml erro ao escapar imagem ');
+import { escapeHtml, escapeHtmlAttr } from "./sanitize.js";
 
-console.assert(escapeHtml('<script>alert(1)</script>') === '&lt;script&gt;alert(1)&lt;/script&gt;',
- 'escapeHtml erro ao escapar script');
+test("escapeHtml escapes HTML tags", () => {
+  assert.equal(escapeHtml("<img>"), "&lt;img&gt;");
+});
 
-console.assert(escapeHtmlAttr('"onerror="alert(1)"') === '&quot;onerror=&quot;alert(1)&quot;',
- 'erro ao escapar atributo HTML');
+test("escapeHtml escapes script payloads", () => {
+  assert.equal(
+    escapeHtml("<script>alert('xss')</script>"),
+    "&lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;"
+  );
+});
 
- console.log('Todos os testes passaram!');
+test("escapeHtml escapes image event-handler payloads as text", () => {
+  assert.equal(
+    escapeHtml('<img src=x onerror="alert()">'),
+    "&lt;img src=x onerror=&quot;alert()&quot;&gt;"
+  );
+});
 
+test("escapeHtml escapes ampersands and quotes", () => {
+  assert.equal(escapeHtml('A & B "quoted"'), "A &amp; B &quot;quoted&quot;");
+});
 
+test("escapeHtml handles empty and nullish values", () => {
+  assert.equal(escapeHtml(""), "");
+  assert.equal(escapeHtml(null), "");
+  assert.equal(escapeHtml(undefined), "");
+});
 
-console.log(escapeHtml('<img>'));
-console.log(escapeHtml('<script>alert(1)</script>'));
+test("escapeHtml preserves non-string values as escaped text", () => {
+  assert.equal(escapeHtml(0), "0");
+  assert.equal(escapeHtml(false), "false");
+});
 
-console.log(
-    escapeHtmlAttr('" onclick="alert(1)')
-);
+test("escapeHtmlAttr escapes quotes for attribute contexts", () => {
+  assert.equal(
+    escapeHtmlAttr('" onclick="alert(1)" data-test=\'x\''),
+    "&quot; onclick=&quot;alert(1)&quot; data-test=&#39;x&#39;"
+  );
+});
