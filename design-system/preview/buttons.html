@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html,body{margin:0}
+  body{background:var(--surface);font-family:var(--font-sans);padding:22px 24px;color:var(--fg)}
+  .grp{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+  .grp:last-child{margin-bottom:0}
+  .btn{font-family:var(--font-sans);font-size:14px;font-weight:600;border-radius:8px;padding:9px 16px;border:1px solid transparent;cursor:pointer;display:inline-flex;align-items:center;gap:7px;line-height:1}
+  .primary{background:var(--brand);color:#fff}
+  .primary.hover{background:var(--brand-hover)}
+  .primary.press{background:var(--green-800);transform:translateY(1px)}
+  .primary.focus{box-shadow:var(--shadow-focus)}
+  .secondary{background:var(--surface);color:var(--fg);border-color:var(--border-strong)}
+  .secondary.hover{background:var(--slate-50)}
+  .ghost{background:transparent;color:var(--fg-muted)}
+  .ghost.hover{background:var(--slate-100)}
+  .danger{background:var(--danger);color:#fff}
+  .disabled{background:var(--slate-100);color:var(--fg-disabled);cursor:not-allowed}
+  .lab{font-family:var(--font-mono);font-size:10px;color:var(--fg-subtle);width:60px;flex:none}
+</style></head>
+<body>
+  <div class="grp"><span class="lab">primary</span>
+    <button class="btn primary">Receive stock</button>
+    <button class="btn primary hover">Hover</button>
+    <button class="btn primary press">Press</button>
+    <button class="btn primary focus">Focus</button>
+  </div>
+  <div class="grp"><span class="lab">neutral</span>
+    <button class="btn secondary">Secondary</button>
+    <button class="btn secondary hover">Hover</button>
+    <button class="btn ghost">Ghost</button>
+    <button class="btn ghost hover">Hover</button>
+  </div>
+  <div class="grp"><span class="lab">other</span>
+    <button class="btn danger">Void sale</button>
+    <button class="btn disabled">Disabled</button>
+    <button class="btn primary" style="padding:6px 11px;font-size:12px">Small</button>
+  </div>
+</body></html>

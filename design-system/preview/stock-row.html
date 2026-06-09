@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html,body{margin:0}
+  body{background:var(--surface);font-family:var(--font-sans);padding:18px 20px;color:var(--fg)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{text-align:left;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--fg-subtle);padding:0 12px 8px;border-bottom:1px solid var(--border)}
+  td{padding:11px 12px;border-bottom:1px solid var(--divider)}
+  tr:last-child td{border-bottom:none}
+  tr.hl td{background:var(--slate-50)}
+  .name{font-weight:600;color:var(--fg-strong)}
+  .num{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+  .right{text-align:right}
+  .badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;border:1px solid}
+  .dot{width:6px;height:6px;border-radius:999px}
+  .in{background:var(--success-bg);color:var(--success);border-color:var(--success-bd)}
+  .low{background:var(--warning-bg);color:var(--warning);border-color:var(--warning-bd)}
+</style></head>
+<body>
+  <table>
+    <thead><tr><th>Medication</th><th>SKU</th><th class="right">On hand</th><th>Status</th><th class="right">Price</th></tr></thead>
+    <tbody>
+      <tr><td class="name">Amoxicillin 500 mg</td><td class="num">VR-AMX-500</td><td class="num right">24</td><td><span class="badge in"><span class="dot" style="background:var(--success)"></span>In stock</span></td><td class="num right">$12.40</td></tr>
+      <tr class="hl"><td class="name">Ibuprofen 200 mg</td><td class="num">VR-IBU-200</td><td class="num right">8</td><td><span class="badge low"><span class="dot" style="background:var(--warning)"></span>Low stock</span></td><td class="num right">$5.10</td></tr>
+      <tr><td class="name">Metformin 850 mg</td><td class="num">VR-MET-850</td><td class="num right">61</td><td><span class="badge in"><span class="dot" style="background:var(--success)"></span>In stock</span></td><td class="num right">$9.75</td></tr>
+    </tbody>
+  </table>
+</body></html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html,body{margin:0}
+  body{background:var(--canvas);font-family:var(--font-sans);padding:20px;color:var(--fg);display:flex;gap:16px}
+  .card{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow-sm);padding:16px}
+  .eyebrow{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-subtle);margin-bottom:8px}
+  .metric{font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-size:30px;font-weight:700;color:var(--fg-strong);line-height:1}
+  .delta{font-family:var(--font-mono);font-size:12px;color:var(--success);margin-top:6px}
+  .delta.down{color:var(--danger)}
+  .sub{font-size:12px;color:var(--fg-subtle);margin-top:6px}
+</style></head>
+<body>
+  <div class="card">
+    <div class="eyebrow">Today's sales</div>
+    <div class="metric">$3,482</div>
+    <div class="delta">▲ 8.2% vs yesterday</div>
+  </div>
+  <div class="card">
+    <div class="eyebrow">Dispensing queue</div>
+    <div class="metric">12</div>
+    <div class="sub">3 awaiting verification</div>
+  </div>
+  <div class="card" style="border-color:var(--warning-bd);background:var(--warning-bg)">
+    <div class="eyebrow" style="color:var(--warning)">Low stock</div>
+    <div class="metric" style="color:var(--warning)">7</div>
+    <div class="sub" style="color:var(--warning)">items below reorder point</div>
+  </div>
+</body></html>

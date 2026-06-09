@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html,body{margin:0}
+  body{background:var(--surface);font-family:var(--font-sans);padding:22px 24px;color:var(--fg);display:flex;align-items:center;gap:28px}
+  .full{height:40px}
+  .tile{display:flex;flex-direction:column;align-items:center;gap:8px}
+  .k{font-family:var(--font-mono);font-size:10px;color:var(--fg-subtle)}
+  .onbrand{background:var(--brand);border-radius:12px;padding:14px;display:flex;align-items:center;justify-content:center}
+  .onlight{background:var(--slate-50);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;align-items:center;justify-content:center}
+  img{display:block}
+</style></head>
+<body>
+  <div class="tile"><img class="full" src="../assets/logo-full.svg" alt="CA Pharmacy"><div class="k">logo-full</div></div>
+  <div class="tile"><div class="onlight"><img src="../assets/logo-mark.svg" width="40" height="40" alt="mark"></div><div class="k">mark</div></div>
+  <div class="tile"><div class="onbrand"><img src="../assets/logo-mark-light.svg" width="40" height="40" alt="mark light"></div><div class="k">mark-light</div></div>
+</body></html>

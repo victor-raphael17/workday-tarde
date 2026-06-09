@@ -1,0 +1,87 @@
+:root {
+  --green-50: #ecfaf4;
+  --green-100: #d2f3e6;
+  --green-200: #a6e6cd;
+  --green-300: #6fd2af;
+  --green-400: #38b78d;
+  --green-500: #169a73;
+  --green-600: #0e8163;
+  --green-700: #0b6a52;
+  --green-800: #0a5642;
+  --green-900: #08362a;
+
+  --slate-0: #ffffff;
+  --slate-25: #fbfcfd;
+  --slate-50: #f5f7f9;
+  --slate-100: #eceff3;
+  --slate-200: #dde3ea;
+  --slate-300: #c5cdd7;
+  --slate-400: #9aa5b2;
+  --slate-500: #6b7585;
+  --slate-600: #4d5765;
+  --slate-700: #353e4b;
+  --slate-800: #232b35;
+  --slate-900: #141a22;
+
+  --success: #0e8163;
+  --success-bg: #ecfaf4;
+  --success-bd: #a6e6cd;
+  --warning: #b6730a;
+  --warning-bg: #fdf4e3;
+  --warning-bd: #f4d9a3;
+  --danger: #c5403c;
+  --danger-bg: #fdeceb;
+  --danger-bd: #f4bdba;
+  --info: #2563c9;
+  --info-bg: #eaf1fd;
+  --info-bd: #b9d0f6;
+  --controlled: #6b3fb0;
+  --controlled-bg: #f2ecfb;
+  --controlled-bd: #d8c6f0;
+
+  --canvas: var(--slate-25);
+  --surface: var(--slate-0);
+  --border: var(--slate-200);
+  --border-strong: var(--slate-300);
+  --divider: var(--slate-100);
+  --fg: var(--slate-800);
+  --fg-strong: var(--slate-900);
+  --fg-muted: var(--slate-600);
+  --fg-subtle: var(--slate-500);
+  --fg-disabled: var(--slate-400);
+  --brand: var(--green-600);
+  --brand-hover: var(--green-700);
+  --font-sans:
+    'Hanken Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    sans-serif;
+  --font-mono:
+    'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --shadow-sm:
+    0 1px 2px rgba(20, 26, 34, 0.06), 0 1px 1px rgba(20, 26, 34, 0.04);
+  --shadow-lg:
+    0 12px 28px rgba(20, 26, 34, 0.12), 0 2px 6px rgba(20, 26, 34, 0.06);
+}
+
+:root {
+  --bs-body-font-family: var(--font-sans);
+  --bs-body-bg: var(--canvas);
+  --bs-body-color: var(--fg);
+  --bs-border-color: var(--border);
+  --bs-secondary-color: var(--fg-subtle);
+  --bs-secondary-bg: var(--slate-50);
+  --bs-link-color: var(--green-700);
+  --bs-link-hover-color: var(--green-800);
+  --bs-success: var(--green-600);
+  --bs-success-rgb: 14, 129, 99;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--canvas);
+  color: var(--fg);
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}

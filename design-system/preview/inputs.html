@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html,body{margin:0}
+  body{background:var(--surface);font-family:var(--font-sans);padding:22px 24px;color:var(--fg);display:grid;grid-template-columns:1fr 1fr;gap:16px 22px}
+  .f{display:flex;flex-direction:column;gap:5px}
+  label{font-size:13px;font-weight:600;color:var(--fg)}
+  .inp{font-family:var(--font-sans);font-size:14px;padding:9px 11px;border:1px solid var(--border-strong);border-radius:8px;background:var(--surface);color:var(--fg)}
+  .inp::placeholder{color:var(--fg-disabled)}
+  .inp.focus{border-color:var(--brand);box-shadow:var(--shadow-focus);outline:none}
+  .inp.err{border-color:var(--danger);box-shadow:0 0 0 3px color-mix(in srgb,var(--danger) 25%,transparent)}
+  .hint{font-size:12px;color:var(--fg-subtle)}
+  .hint.bad{color:var(--danger)}
+  .search{display:flex;align-items:center;gap:8px;border:1px solid var(--border-strong);border-radius:8px;padding:9px 11px;color:var(--fg-subtle);font-family:var(--font-mono);font-size:13px}
+</style></head>
+<body>
+  <div class="f"><label>Medication name</label><input class="inp" value="Amoxicillin 500 mg"></div>
+  <div class="f"><label>Focused</label><input class="inp focus" value="Ibuprofen 200 mg"></div>
+  <div class="f"><label>Reorder point</label><input class="inp err" value="-4"><span class="hint bad">Must be a positive number</span></div>
+  <div class="f"><label>Search (mono)</label><div class="search">⌕&nbsp; Scan barcode or SKU…</div><span class="hint">Press / to focus</span></div>
+</body></html>

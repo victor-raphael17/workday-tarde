@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html,body{margin:0}
+  body{background:var(--surface);font-family:var(--font-sans);padding:20px 24px;color:var(--fg)}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 18px}
+  .cell{display:flex;flex-direction:column;gap:3px}
+  .k{font-family:var(--font-sans);font-size:11px;color:var(--fg-subtle);font-weight:600}
+  .v{font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-size:17px;font-weight:500;color:var(--fg-strong)}
+  .note{margin-top:16px;font-family:var(--font-sans);font-size:12px;color:var(--fg-subtle)}
+</style></head>
+<body>
+  <div class="grid">
+    <div class="cell"><span class="k">SKU</span><span class="v">CA-AMX-500</span></div>
+    <div class="cell"><span class="k">NDC</span><span class="v">0093-3107-01</span></div>
+    <div class="cell"><span class="k">Batch / lot</span><span class="v">L24-8841</span></div>
+    <div class="cell"><span class="k">Quantity</span><span class="v">24 packs</span></div>
+    <div class="cell"><span class="k">Unit price</span><span class="v">$12.40</span></div>
+    <div class="cell"><span class="k">Expiry</span><span class="v">12 Aug 2026</span></div>
+  </div>
+  <div class="note">JetBrains Mono · tabular-nums — used for all SKUs, codes, quantities, prices &amp; dates.</div>
+</body></html>

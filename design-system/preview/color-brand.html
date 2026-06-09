@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html,body{margin:0}
+  body{background:var(--surface);font-family:var(--font-sans);padding:20px 24px;color:var(--fg)}
+  .scale{display:flex;gap:6px}
+  .sw{flex:1;display:flex;flex-direction:column;gap:6px}
+  .chip{height:54px;border-radius:8px;border:1px solid rgba(20,26,34,.06)}
+  .n{font-family:var(--font-mono);font-size:10px;color:var(--fg-subtle);text-align:center}
+  .hx{font-family:var(--font-mono);font-size:9px;color:var(--fg-disabled);text-align:center}
+  .lead{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+  .star{font-size:11px;color:var(--brand);font-weight:700}
+</style></head>
+<body>
+  <div class="lead t-label">Pharmacy Green — primary brand <span class="star">● 600 = primary</span></div>
+  <div class="scale">
+    <div class="sw"><div class="chip" style="background:var(--green-50)"></div><div class="n">50</div></div>
+    <div class="sw"><div class="chip" style="background:var(--green-100)"></div><div class="n">100</div></div>
+    <div class="sw"><div class="chip" style="background:var(--green-200)"></div><div class="n">200</div></div>
+    <div class="sw"><div class="chip" style="background:var(--green-300)"></div><div class="n">300</div></div>
+    <div class="sw"><div class="chip" style="background:var(--green-400)"></div><div class="n">400</div></div>
+    <div class="sw"><div class="chip" style="background:var(--green-500)"></div><div class="n">500</div></div>
+    <div class="sw"><div class="chip" style="background:var(--green-600);box-shadow:0 0 0 2px var(--brand)"></div><div class="n">600</div><div class="hx">#0e8163</div></div>
+    <div class="sw"><div class="chip" style="background:var(--green-700)"></div><div class="n">700</div></div>
+    <div class="sw"><div class="chip" style="background:var(--green-800)"></div><div class="n">800</div></div>
+    <div class="sw"><div class="chip" style="background:var(--green-900)"></div><div class="n">900</div></div>
+  </div>
+</body></html>
