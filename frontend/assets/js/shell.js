@@ -1,5 +1,6 @@
 import { branch, navigation } from "./data.js";
 import { api, auth, initials as toInitials } from "./api.js";
+import { escapeHtml, escapeHtmlAttr } from "./sanitize.js";
 import logoMark from "../images/logo-mark.svg";
 
 const ROLE_LABELS = {
@@ -40,19 +41,19 @@ export function renderShell(pageId) {
     </div>
     <nav class="sidebar-nav" aria-label="Primary navigation">
       ${navigation.map((item) => `
-          <a class="sidebar-link ${pageId === item.id ? "active" : ""}" href="${item.href}" ${pageId === item.id ? 'aria-current="page"' : ""}>
-            <i data-lucide="${item.icon}"></i>
-            <span>${item.label}</span>
-            <span class="sidebar-link-count d-none" data-nav-count="${item.id}"></span>
+          <a class="sidebar-link ${pageId === item.id ? "active" : ""}" href="${escapeHtmlAttr(item.href)}" ${pageId === item.id ? 'aria-current="page"' : ""}>
+            <i data-lucide="${escapeHtmlAttr(item.icon)}"></i>
+            <span>${escapeHtml(item.label)}</span>
+            <span class="sidebar-link-count d-none" data-nav-count="${escapeHtmlAttr(item.id)}"></span>
           </a>
         `).join("")}
     </nav>
     <div class="sidebar-section-label">Current shift</div>
     <div class="sidebar-shift-card d-flex align-items-center gap-3">
-      <span class="shift-avatar">${initials}</span>
+      <span class="shift-avatar">${escapeHtml(initials)}</span>
       <div>
-        <div class="sidebar-shift-name">${displayName}</div>
-        <div class="sidebar-shift-role">${displayRole} · ${branch.name}</div>
+        <div class="sidebar-shift-name">${escapeHtml(displayName)}</div>
+        <div class="sidebar-shift-role">${escapeHtml(displayRole)} · ${escapeHtml(branch.name)}</div>
       </div>
     </div>
   `;
@@ -69,7 +70,7 @@ export function renderShell(pageId) {
     <div class="topbar-actions">
       <div class="topbar-branch">
         <i data-lucide="store"></i>
-        <span>${branch.name}</span>
+        <span>${escapeHtml(branch.name)}</span>
       </div>
       <button class="topbar-icon" type="button" aria-label="Notifications">
         <i data-lucide="bell"></i>

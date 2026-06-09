@@ -5,6 +5,7 @@
  */
 
 import { toneClass } from "./api.js";
+import { escapeHtml, escapeHtmlAttr } from "./sanitize.js";
 
 let toastHost = null;
 
@@ -28,13 +29,13 @@ export function toast(message, tone = "info") {
 }
 
 export function statusBadge(stateKey, label) {
-  return `<span class="status-badge ${toneClass(stateKey)}">${label}</span>`;
+  return `<span class="status-badge ${escapeHtmlAttr(toneClass(stateKey))}">${escapeHtml(label)}</span>`;
 }
 
 /** Render a centered "empty" / "error" / "loading" placeholder string. */
 export function placeholder(message, tone = "muted") {
   const cls = tone === "error" ? "text-danger" : "text-body-secondary";
-  return `<div class="muted-note text-center w-100 py-4 ${cls}">${message}</div>`;
+  return `<div class="muted-note text-center w-100 py-4 ${cls}">${escapeHtml(message)}</div>`;
 }
 
 /**
@@ -56,43 +57,43 @@ export function openForm({ title, fields, submitLabel = "Save" }) {
             const value = typeof opt === "string" ? opt : opt.value;
             const label = typeof opt === "string" ? opt : opt.label;
             const selected = String(field.value ?? "") === String(value) ? "selected" : "";
-            return `<option value="${value}" ${selected}>${label}</option>`;
+            return `<option value="${escapeHtmlAttr(value)}" ${selected}>${escapeHtml(label)}</option>`;
           })
           .join("");
         return `
           <label class="modal-field">
-            <span>${field.label}${field.required ? " *" : ""}</span>
-            <select id="${id}" name="${field.name}" ${field.required ? "required" : ""}>${options}</select>
+            <span>${escapeHtml(field.label)}${field.required ? " *" : ""}</span>
+            <select id="${escapeHtmlAttr(id)}" name="${escapeHtmlAttr(field.name)}" ${field.required ? "required" : ""}>${options}</select>
           </label>`;
       }
       if (field.type === "checkbox") {
         return `
           <label class="modal-field modal-field-inline">
-            <input type="checkbox" id="${id}" name="${field.name}" ${field.value ? "checked" : ""}>
-            <span>${field.label}</span>
+            <input type="checkbox" id="${escapeHtmlAttr(id)}" name="${escapeHtmlAttr(field.name)}" ${field.value ? "checked" : ""}>
+            <span>${escapeHtml(field.label)}</span>
           </label>`;
       }
       return `
         <label class="modal-field">
-          <span>${field.label}${field.required ? " *" : ""}</span>
-          <input type="${field.type || "text"}" id="${id}" name="${field.name}"
-            value="${field.value ?? ""}" placeholder="${field.placeholder || ""}"
-            ${field.required ? "required" : ""} ${field.step ? `step="${field.step}"` : ""}>
-          ${field.help ? `<small class="text-body-secondary">${field.help}</small>` : ""}
+          <span>${escapeHtml(field.label)}${field.required ? " *" : ""}</span>
+          <input type="${escapeHtmlAttr(field.type || "text")}" id="${escapeHtmlAttr(id)}" name="${escapeHtmlAttr(field.name)}"
+            value="${escapeHtmlAttr(field.value ?? "")}" placeholder="${escapeHtmlAttr(field.placeholder || "")}"
+            ${field.required ? "required" : ""} ${field.step ? `step="${escapeHtmlAttr(field.step)}"` : ""}>
+          ${field.help ? `<small class="text-body-secondary">${escapeHtml(field.help)}</small>` : ""}
         </label>`;
     };
 
     overlay.innerHTML = `
-      <div class="modal-card" role="dialog" aria-modal="true" aria-label="${title}">
+      <div class="modal-card" role="dialog" aria-modal="true" aria-label="${escapeHtmlAttr(title)}">
         <div class="modal-head">
-          <h2 class="section-title mb-0">${title}</h2>
+          <h2 class="section-title mb-0">${escapeHtml(title)}</h2>
           <button type="button" class="modal-close" aria-label="Close">&times;</button>
         </div>
         <form class="modal-body">
           ${fields.map(renderField).join("")}
           <div class="modal-actions">
             <button type="button" class="btn btn-outline-secondary btn-sm px-3" data-cancel>Cancel</button>
-            <button type="submit" class="btn btn-success btn-sm px-3">${submitLabel}</button>
+            <button type="submit" class="btn btn-success btn-sm px-3">${escapeHtml(submitLabel)}</button>
           </div>
         </form>
       </div>`;

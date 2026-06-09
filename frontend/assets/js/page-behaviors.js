@@ -1,5 +1,6 @@
 import { api, ApiError, currency, formatDate, initials, toneClass } from "./api.js";
 import { openForm, placeholder, statusBadge, toast } from "./ui.js";
+import { escapeHtml, escapeHtmlAttr } from "./sanitize.js";
 
 const POS_TAX_RATE = 0.05; // mirrors the API's TAX_RATE for the live cart preview
 
@@ -81,7 +82,7 @@ async function bindDashboard() {
             const height = Math.max(6, Math.round((d.total / max) * 100));
             const peak = d.total === max && total > 0 ? "sales-bar-peak" : "";
             const label = new Date(`${d.date}T00:00:00`).toLocaleDateString("en-US", { weekday: "short" });
-            return `<div class="sales-bar-col"><div class="sales-bar ${peak}" style="height:${height}%" title="${currency.format(d.total)}"></div><span class="mono">${label}</span></div>`;
+            return `<div class="sales-bar-col"><div class="sales-bar ${peak}" style="height:${height}%" title="${escapeHtmlAttr(currency.format(d.total))}"></div><span class="mono">${escapeHtml(label)}</span></div>`;
           })
           .join("")
       : placeholder("No sales recorded this week.");
@@ -106,8 +107,8 @@ async function bindDashboard() {
                 <div class="d-flex align-items-center gap-3">
                   <span class="status-avatar ${avatarMod}"><i data-lucide="${icon}"></i></span>
                   <div class="flex-grow-1">
-                    <div class="fw-semibold">${m.name} ${m.strength || ""}</div>
-                    <div class="small text-body-secondary mono">${note}</div>
+                    <div class="fw-semibold">${escapeHtml(m.name)} ${escapeHtml(m.strength || "")}</div>
+                    <div class="small text-body-secondary mono">${escapeHtml(note)}</div>
                   </div>
                   ${statusBadge(tone, label)}
                 </div>
@@ -137,15 +138,15 @@ async function bindDashboard() {
                 <tr>
                   <td>
                     <div class="d-flex align-items-center gap-3">
-                      <span class="table-avatar ${avatarMod}">${initials(rx.patient.name)}</span>
+                      <span class="table-avatar ${avatarMod}">${escapeHtml(initials(rx.patient.name))}</span>
                       <div>
-                        <div class="fw-semibold">${rx.patient.name}</div>
-                        <div class="small text-body-secondary mono">${rx.code}</div>
+                        <div class="fw-semibold">${escapeHtml(rx.patient.name)}</div>
+                        <div class="small text-body-secondary mono">${escapeHtml(rx.code)}</div>
                       </div>
                     </div>
                   </td>
-                  <td>${rx.medication.name} ${rx.medication.strength || ""}</td>
-                  <td>${rx.prescriber}</td>
+                  <td>${escapeHtml(rx.medication.name)} ${escapeHtml(rx.medication.strength || "")}</td>
+                  <td>${escapeHtml(rx.prescriber)}</td>
                   <td>${flag}</td>
                   <td>${statusBadge(rx.state, stateLabel)}</td>
                 </tr>`;
@@ -256,14 +257,14 @@ async function bindInventory() {
             const active = m.id === selectedId ? "table-active" : "";
             const expiryClass = m.status === "expiring" || m.status === "expired" ? "text-warning-emphasis" : "text-body-secondary";
             return `
-              <tr data-inventory-row data-id="${m.id}" class="${active}" role="button" tabindex="0">
-                <td><div class="fw-semibold">${m.name}</div><div class="small text-body-secondary">${[m.strength, m.form].filter(Boolean).join(" · ")}</div></td>
-                <td class="mono text-body-secondary">${m.sku}</td>
-                <td>${m.category || "—"}</td>
-                <td class="text-end mono">${m.on_hand}</td>
-                <td class="mono ${expiryClass}">${formatDate(m.expiry)}</td>
+              <tr data-inventory-row data-id="${escapeHtmlAttr(m.id)}" class="${active}" role="button" tabindex="0">
+                <td><div class="fw-semibold">${escapeHtml(m.name)}</div><div class="small text-body-secondary">${escapeHtml([m.strength, m.form].filter(Boolean).join(" · "))}</div></td>
+                <td class="mono text-body-secondary">${escapeHtml(m.sku)}</td>
+                <td>${escapeHtml(m.category || "—")}</td>
+                <td class="text-end mono">${escapeHtml(m.on_hand)}</td>
+                <td class="mono ${expiryClass}">${escapeHtml(formatDate(m.expiry))}</td>
                 <td>${statusBadge(badge.tone, badge.label)}</td>
-                <td class="text-end mono">${currency.format(m.price)}</td>
+                <td class="text-end mono">${escapeHtml(currency.format(m.price))}</td>
               </tr>`;
           })
           .join("")
@@ -412,10 +413,10 @@ async function bindPos() {
             const icon = p.controlled ? "shield-alert" : "pill";
             const out = p.on_hand <= 0 ? "product-card-disabled" : "";
             return `
-              <article class="product-card p-3 ${out}" data-product data-id="${p.id}" role="button" tabindex="0">
-                <div class="d-flex justify-content-between gap-3 align-items-start mb-2"><div class="product-title">${p.name}</div><i data-lucide="${icon}"></i></div>
-                <div class="product-meta">${[p.strength, p.form].filter(Boolean).join(" · ")}</div>
-                <div class="d-flex justify-content-between gap-2 align-items-center mt-3"><span class="product-price mono">${currency.format(p.price)}</span><span class="product-meta mono">${p.on_hand} left</span></div>
+              <article class="product-card p-3 ${out}" data-product data-id="${escapeHtmlAttr(p.id)}" role="button" tabindex="0">
+                <div class="d-flex justify-content-between gap-3 align-items-start mb-2"><div class="product-title">${escapeHtml(p.name)}</div><i data-lucide="${escapeHtmlAttr(icon)}"></i></div>
+                <div class="product-meta">${escapeHtml([p.strength, p.form].filter(Boolean).join(" · "))}</div>
+                <div class="d-flex justify-content-between gap-2 align-items-center mt-3"><span class="product-price mono">${escapeHtml(currency.format(p.price))}</span><span class="product-meta mono">${escapeHtml(p.on_hand)} left</span></div>
               </article>`;
           })
           .join("")
@@ -633,17 +634,17 @@ async function bindPrescriptions() {
       : "";
     const next = RX_ADVANCE[rx.state];
     const advanceBtn = next
-      ? `<button class="btn btn-success btn-sm px-3 mt-3" type="button" data-advance="${rx.id}" data-next="${next}">${RX_ADVANCE_LABEL[rx.state]}</button>`
+      ? `<button class="btn btn-success btn-sm px-3 mt-3" type="button" data-advance="${escapeHtmlAttr(rx.id)}" data-next="${escapeHtmlAttr(next)}">${escapeHtml(RX_ADVANCE_LABEL[rx.state])}</button>`
       : "";
     const voidBtn = rx.state !== "dispensed" && rx.state !== "voided"
-      ? `<button class="btn btn-link btn-sm text-danger text-decoration-none px-0 mt-2" type="button" data-void="${rx.id}">Void</button>`
+      ? `<button class="btn btn-link btn-sm text-danger text-decoration-none px-0 mt-2" type="button" data-void="${escapeHtmlAttr(rx.id)}">Void</button>`
       : "";
     return `
       <article class="queue-card p-3">
-        <div class="d-flex justify-content-between gap-2 mb-2"><span class="queue-card-id">${rx.code}</span><span class="queue-card-id">${timeAgo(rx.created_at)}</span></div>
-        <div class="queue-card-title">${rx.patient.name}</div>
-        <div class="queue-card-meta mt-1">${rx.medication.name} ${rx.medication.strength || ""} · <span class="mono">${rx.quantity} ${rx.unit || ""}</span></div>
-        <div class="queue-card-footer mt-3"><span class="small text-body-secondary">${rx.prescriber}</span>${flagBadge}</div>
+        <div class="d-flex justify-content-between gap-2 mb-2"><span class="queue-card-id">${escapeHtml(rx.code)}</span><span class="queue-card-id">${escapeHtml(timeAgo(rx.created_at))}</span></div>
+        <div class="queue-card-title">${escapeHtml(rx.patient.name)}</div>
+        <div class="queue-card-meta mt-1">${escapeHtml(rx.medication.name)} ${escapeHtml(rx.medication.strength || "")} · <span class="mono">${escapeHtml(rx.quantity)} ${escapeHtml(rx.unit || "")}</span></div>
+        <div class="queue-card-footer mt-3"><span class="small text-body-secondary">${escapeHtml(rx.prescriber)}</span>${flagBadge}</div>
         <div class="d-flex flex-column align-items-start">${advanceBtn}${voidBtn}</div>
       </article>`;
   };
@@ -666,7 +667,7 @@ async function bindPrescriptions() {
       return `
         <div class="col-12 col-xl-3">
           <div class="queue-column">
-            <div class="queue-column-head"><h2 class="section-title mb-0">${col.label}</h2><span class="queue-column-count">${cards.length}</span></div>
+            <div class="queue-column-head"><h2 class="section-title mb-0">${escapeHtml(col.label)}</h2><span class="queue-column-count">${cards.length}</span></div>
             ${cards.map(card).join("") || placeholder("Empty.")}
             ${note}
           </div>
@@ -796,13 +797,13 @@ async function bindPatients() {
           .map((p) => {
             const active = p.id === selectedId ? "table-active" : "";
             return `
-              <tr data-patient-row data-id="${p.id}" class="${active}" role="button" tabindex="0">
-                <td><div class="fw-semibold">${p.name}</div></td>
-                <td class="mono text-body-secondary">${p.code}</td>
-                <td class="mono text-body-secondary">${formatDate(p.dob)}</td>
-                <td>${p.plan || "—"}</td>
-                <td class="text-end mono">${p.active ?? "—"}</td>
-                <td class="mono text-body-secondary">${formatDate(p.last_visit)}</td>
+              <tr data-patient-row data-id="${escapeHtmlAttr(p.id)}" class="${active}" role="button" tabindex="0">
+                <td><div class="fw-semibold">${escapeHtml(p.name)}</div></td>
+                <td class="mono text-body-secondary">${escapeHtml(p.code)}</td>
+                <td class="mono text-body-secondary">${escapeHtml(formatDate(p.dob))}</td>
+                <td>${escapeHtml(p.plan || "—")}</td>
+                <td class="text-end mono">${escapeHtml(p.active ?? "—")}</td>
+                <td class="mono text-body-secondary">${escapeHtml(formatDate(p.last_visit))}</td>
               </tr>`;
           })
           .join("")
@@ -929,8 +930,8 @@ async function bindOrders() {
         .map(
           (item) => `
             <div class="detail-row">
-              <span class="detail-row-label">${item.medication_name}</span>
-              <span class="detail-row-value mono">${item.units} × ${currency.format(item.unit_cost)}</span>
+              <span class="detail-row-label">${escapeHtml(item.medication_name)}</span>
+              <span class="detail-row-value mono">${escapeHtml(item.units)} × ${escapeHtml(currency.format(item.unit_cost))}</span>
             </div>`
         )
         .join("") || placeholder("No line items.");
@@ -938,10 +939,10 @@ async function bindOrders() {
       if (fields.actions) {
         const next = PO_ADVANCE[po.state];
         const advanceBtn = next
-          ? `<button class="btn btn-success btn-sm px-3" type="button" data-order-advance data-id="${po.id}" data-next="${next}">${PO_ADVANCE_LABEL[po.state]}</button>`
+          ? `<button class="btn btn-success btn-sm px-3" type="button" data-order-advance data-id="${escapeHtmlAttr(po.id)}" data-next="${escapeHtmlAttr(next)}">${escapeHtml(PO_ADVANCE_LABEL[po.state])}</button>`
           : "";
         const cancelBtn = po.state !== "received" && po.state !== "cancelled"
-          ? `<button class="btn btn-outline-secondary btn-sm px-3" type="button" data-order-cancel data-id="${po.id}">Cancel</button>`
+          ? `<button class="btn btn-outline-secondary btn-sm px-3" type="button" data-order-cancel data-id="${escapeHtmlAttr(po.id)}">Cancel</button>`
           : "";
         fields.actions.innerHTML = advanceBtn + cancelBtn || `<span class="muted-note">No actions available.</span>`;
         fields.actions.querySelector("[data-order-advance]")?.addEventListener("click", (e) => {
@@ -967,14 +968,14 @@ async function bindOrders() {
           .map((o) => {
             const active = o.id === selectedId ? "table-active" : "";
             return `
-              <tr data-order-row data-id="${o.id}" class="${active}" role="button" tabindex="0">
-                <td class="mono fw-semibold">${o.code}</td>
-                <td>${o.supplier.name}</td>
-                <td class="text-end mono">${o.item_count}</td>
-                <td class="text-end mono">${o.total_units}</td>
-                <td class="mono text-body-secondary">${formatDate(o.expected_at)}</td>
+              <tr data-order-row data-id="${escapeHtmlAttr(o.id)}" class="${active}" role="button" tabindex="0">
+                <td class="mono fw-semibold">${escapeHtml(o.code)}</td>
+                <td>${escapeHtml(o.supplier.name)}</td>
+                <td class="text-end mono">${escapeHtml(o.item_count)}</td>
+                <td class="text-end mono">${escapeHtml(o.total_units)}</td>
+                <td class="mono text-body-secondary">${escapeHtml(formatDate(o.expected_at))}</td>
                 <td>${statusBadge(o.state, PO_STATE_LABEL[o.state] || o.state)}</td>
-                <td class="text-end mono">${currency.format(o.total_cost)}</td>
+                <td class="text-end mono">${escapeHtml(currency.format(o.total_cost))}</td>
               </tr>`;
           })
           .join("")
@@ -1006,7 +1007,7 @@ async function bindOrders() {
       const summary = await api.dashboard();
       const names = (summary.low_stock || []).map((m) => m.name);
       banner.innerHTML = names.length
-        ? `<strong>${names.length} item${names.length === 1 ? " is" : "s are"} at or below the reorder point.</strong><p class="mono">${names.join(" · ")}</p>`
+        ? `<strong>${names.length} item${names.length === 1 ? " is" : "s are"} at or below the reorder point.</strong><p class="mono">${escapeHtml(names.join(" · "))}</p>`
         : `<strong>All stock is above the reorder point.</strong>`;
     } catch {
       // banner is non-critical
