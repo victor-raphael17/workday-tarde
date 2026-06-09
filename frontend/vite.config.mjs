@@ -15,8 +15,8 @@ export default defineConfig({
         orders: resolve(__dirname, "pages/orders.html"),
         patients: resolve(__dirname, "pages/patients.html"),
         pos: resolve(__dirname, "pages/pos.html"),
-        prescriptions: resolve(__dirname, "pages/prescriptions.html")
-      }
-    }
-  }
+        prescriptions: resolve(__dirname, "pages/prescriptions.html"),
+      },
+    },
+  },
 });

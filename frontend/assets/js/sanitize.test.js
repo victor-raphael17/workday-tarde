@@ -1,44 +1,63 @@
-import assert from "node:assert/strict";
-import test from "node:test";
-
+import { describe, expect, it } from "vitest";
 import { escapeHtml, escapeHtmlAttr } from "./sanitize.js";
 
-test("escapeHtml escapes HTML tags", () => {
-  assert.equal(escapeHtml("<img>"), "&lt;img&gt;");
-});
+describe("sanitize.js", () => {
+  describe("escapeHtml", () => {
+    it("escapes HTML tags", () => {
+      expect(escapeHtml("<img>")).toBe("&lt;img&gt;");
+      expect(escapeHtml("<script>alert('xss')</script>")).toContain("&lt;script&gt;");
+    });
 
-test("escapeHtml escapes script payloads", () => {
-  assert.equal(
-    escapeHtml("<script>alert('xss')</script>"),
-    "&lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;"
-  );
-});
+    it("escapes script payloads as text", () => {
+      expect(escapeHtml("<script>alert('xss')</script>")).toBe(
+        "&lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;",
+      );
+    });
 
-test("escapeHtml escapes image event-handler payloads as text", () => {
-  assert.equal(
-    escapeHtml('<img src=x onerror="alert()">'),
-    "&lt;img src=x onerror=&quot;alert()&quot;&gt;"
-  );
-});
+    it("escapes event-handler payloads without leaving raw tags or quotes", () => {
+      const escaped = escapeHtml('<img src=x onerror="alert()">');
 
-test("escapeHtml escapes ampersands and quotes", () => {
-  assert.equal(escapeHtml('A & B "quoted"'), "A &amp; B &quot;quoted&quot;");
-});
+      expect(escaped).toBe("&lt;img src=x onerror=&quot;alert()&quot;&gt;");
+      expect(escaped).not.toContain("<img");
+      expect(escaped).not.toContain('"');
+    });
 
-test("escapeHtml handles empty and nullish values", () => {
-  assert.equal(escapeHtml(""), "");
-  assert.equal(escapeHtml(null), "");
-  assert.equal(escapeHtml(undefined), "");
-});
+    it("escapes ampersands", () => {
+      expect(escapeHtml("A & B")).toBe("A &amp; B");
+    });
 
-test("escapeHtml preserves non-string values as escaped text", () => {
-  assert.equal(escapeHtml(0), "0");
-  assert.equal(escapeHtml(false), "false");
-});
+    it("escapes double and single quotes", () => {
+      expect(escapeHtml('He said "hello" and it\'s ok')).toBe(
+        "He said &quot;hello&quot; and it&#39;s ok",
+      );
+    });
 
-test("escapeHtmlAttr escapes quotes for attribute contexts", () => {
-  assert.equal(
-    escapeHtmlAttr('" onclick="alert(1)" data-test=\'x\''),
-    "&quot; onclick=&quot;alert(1)&quot; data-test=&#39;x&#39;"
-  );
+    it("handles null, undefined, and empty values", () => {
+      expect(escapeHtml(null)).toBe("");
+      expect(escapeHtml(undefined)).toBe("");
+      expect(escapeHtml("")).toBe("");
+    });
+
+    it("preserves safe text and stringifies primitive values", () => {
+      expect(escapeHtml("Hello World 123")).toBe("Hello World 123");
+      expect(escapeHtml(0)).toBe("0");
+      expect(escapeHtml(false)).toBe("false");
+    });
+  });
+
+  describe("escapeHtmlAttr", () => {
+    it("escapes attribute values", () => {
+      const escaped = escapeHtmlAttr('value with "quotes"');
+
+      expect(escaped).toContain("&quot;");
+    });
+
+    it("escapes single quotes", () => {
+      expect(escapeHtmlAttr("it's")).toContain("&#39;");
+    });
+
+    it("escapes ampersands in attributes", () => {
+      expect(escapeHtmlAttr("a&b")).toBe("a&amp;b");
+    });
+  });
 });

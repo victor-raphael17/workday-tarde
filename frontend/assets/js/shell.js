@@ -39,13 +39,17 @@ export function renderShell(pageId) {
       <div class="sidebar-brand-title">CA <span>Pharmacy</span></div>
     </div>
     <nav class="sidebar-nav" aria-label="Primary navigation">
-      ${navigation.map((item) => `
+      ${navigation
+        .map(
+          (item) => `
           <a class="sidebar-link ${pageId === item.id ? "active" : ""}" href="${item.href}" ${pageId === item.id ? 'aria-current="page"' : ""}>
             <i data-lucide="${item.icon}"></i>
             <span>${item.label}</span>
             <span class="sidebar-link-count d-none" data-nav-count="${item.id}"></span>
           </a>
-        `).join("")}
+        `,
+        )
+        .join("")}
     </nav>
     <div class="sidebar-section-label">Current shift</div>
     <div class="sidebar-shift-card d-flex align-items-center gap-3">
@@ -142,7 +146,8 @@ export function bindShellEvents() {
     }
 
     const target = event.target;
-    const isTyping = target instanceof HTMLElement && ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName);
+    const isTyping =
+      target instanceof HTMLElement && ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName);
     if (event.key === "/" && !isTyping && searchInput) {
       event.preventDefault();
       searchInput.focus();

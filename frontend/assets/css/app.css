@@ -135,7 +135,9 @@ body {
   text-decoration: none;
   font-size: 0.94rem;
   font-weight: 600;
-  transition: background-color 120ms ease, color 120ms ease;
+  transition:
+    background-color 120ms ease,
+    color 120ms ease;
 }
 
 .sidebar-link:hover {
@@ -583,7 +585,10 @@ body {
   border-radius: 1rem;
   border: 1px solid var(--border);
   background: var(--surface);
-  transition: border-color 120ms ease, transform 120ms ease, box-shadow 120ms ease;
+  transition:
+    border-color 120ms ease,
+    transform 120ms ease,
+    box-shadow 120ms ease;
 }
 
 .product-card:hover {
@@ -818,7 +823,9 @@ body.nav-open .app-scrim {
   border: 1px solid var(--border);
   background: var(--surface);
   cursor: pointer;
-  transition: border-color 120ms ease, color 120ms ease;
+  transition:
+    border-color 120ms ease,
+    color 120ms ease;
 }
 
 .chip-action:hover {
@@ -853,7 +860,9 @@ body.nav-open .app-scrim {
   box-shadow: var(--shadow-lg);
   opacity: 0;
   transform: translateY(8px);
-  transition: opacity 200ms ease, transform 200ms ease;
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease;
 }
 
 .toast-note.show {
@@ -1165,7 +1174,9 @@ body.nav-open .app-scrim {
   border: 1px solid var(--border-strong);
   border-radius: 0.75rem;
   background: var(--surface);
-  transition: border-color 120ms ease, box-shadow 120ms ease;
+  transition:
+    border-color 120ms ease,
+    box-shadow 120ms ease;
 }
 
 .auth-input:focus-within {
