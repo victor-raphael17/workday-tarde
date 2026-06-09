@@ -1,0 +1,122 @@
+# Tasks feitas e verificadas
+
+Data da revisao: 2026-06-09
+Branch local revisada: `main`
+Reviewer documentado nas branches: `licori12`
+
+## Branches integradas em `main`
+
+### `feature/frontend-tests-xss-clean`
+
+Status: feita e mergeada em `main`.
+
+Tasks concluidas:
+- Adicionar testes ao frontend com Vitest.
+- Adicionar testes para helpers de API/UI/sanitizacao.
+- Aplicar sanitizacao XSS em pontos que renderizam dados via `innerHTML`.
+
+Arquivos principais:
+- `frontend/vitest.config.js`
+- `frontend/assets/js/api.test.js`
+- `frontend/assets/js/ui.test.js`
+- `frontend/assets/js/sanitize.test.js`
+- `frontend/assets/js/sanitize.js`
+- `frontend/assets/js/page-behaviors.js`
+- `frontend/assets/js/shell.js`
+- `frontend/assets/js/ui.js`
+
+Validacao:
+- `npm test --workspace frontend -- --run`: passou com 34 testes.
+- `npm run build --workspace frontend`: passou.
+
+Observacao:
+- A cobertura de API ainda pode ser melhorada com testes diretos de parsing do envelope de sucesso/erro.
+
+### `feature-add-eslint-and-prettier-configuration-with-documentation`
+
+Status: feita e mergeada em `main`.
+
+Tasks concluidas:
+- Adicionar ESLint.
+- Adicionar Prettier.
+- Adicionar scripts de lint/format no workspace frontend e raiz.
+- Adicionar documentacao de lint em `frontend/LINTING.md`.
+
+Arquivos principais:
+- `frontend/eslint.config.js`
+- `frontend/.prettierrc`
+- `frontend/LINTING.md`
+- `frontend/package.json`
+- `package.json`
+- `package-lock.json`
+
+Validacao:
+- `npm run lint:check --workspace frontend`: passou.
+- `npm test --workspace frontend -- --run`: passou com 34 testes.
+- `npm run build --workspace frontend`: passou.
+
+### `backend-dev-2-auth-router`
+
+Status: feita e mergeada em `main`.
+
+Tasks concluidas:
+- Adicionar middleware de autenticacao por bearer token.
+- Proteger rotas autenticadas no backend.
+- Manter login publico.
+- Retornar 401 quando token esta ausente ou invalido.
+- Adicionar suporte a middleware no router.
+- Disponibilizar usuario autenticado no `Request`.
+
+Arquivos principais:
+- `backend/routes/api.php`
+- `backend/src/Core/Middleware/AuthMiddleware.php`
+- `backend/src/Core/Router.php`
+- `backend/src/Core/Request.php`
+- `backend/src/Core/RequestInterface.php`
+- `backend/src/Core/Response.php`
+- `backend/src/Services/AuthService.php`
+- `backend/src/Services/AuthServiceInterface.php`
+- `backend/tests/Middleware/AuthMiddlewareTest.php`
+- `backend/tests/smoke.sh`
+
+Validacao:
+- `php -l` nos arquivos PHP de `backend/src`, `backend/routes` e `backend/tests`: passou.
+- Teste direto do middleware sem token: retornou 401.
+- `npm run lint:check --workspace frontend`: passou.
+- `npm test --workspace frontend -- --run`: passou com 34 testes.
+- `npm run build --workspace frontend`: passou.
+
+## Ajuste complementar
+
+### Docker healthcheck do frontend
+
+Status: feito.
+
+Task/ajuste:
+- Corrigir healthcheck do container `web` para usar `http://127.0.0.1/` em vez de `http://localhost/`.
+
+Arquivo:
+- `frontend/Dockerfile`
+
+Validacao Docker:
+- `DOCKER_BUILDKIT=0 docker compose up -d --build`: passou.
+- `docker compose ps`: `db` healthy, `api` up, `web` healthy.
+- `curl http://localhost:8080/health`: API healthy.
+- `curl http://localhost:4173/`: HTTP 200.
+- `API=http://localhost:8080 bash backend/tests/smoke.sh`: 14 passed, 0 failed.
+
+## Ainda pendente
+
+- Completar cobertura de `api.js` para parsing de envelope de sucesso/erro.
+- Pipeline de CI.
+- Resolver o parametro `reason` do ajuste de estoque.
+- Checagem proativa de expiracao do token no frontend.
+- Feedback offline/retry de rede.
+- Busca global na topbar.
+- Focus trap em modais.
+- `aria-live` em toasts/estados.
+- Paginacao backend/frontend.
+- Rate limiting no login.
+- Logging estruturado de erros.
+- Restringir CORS por configuracao.
+- Suite backend mais completa com PHPUnit.
