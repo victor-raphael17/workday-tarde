@@ -46,6 +46,12 @@ final class Response
         return $this->status;
     }
 
+    /** 429 Too Many Requests */
+    public static function tooManyRequests(mixed $data, int $retryAfter = 300): self
+    {
+        return new self($data, 429, ['Retry-After' => (string) $retryAfter]);
+    }
+
     public function send(): void
     {
         if (!headers_sent()) {
