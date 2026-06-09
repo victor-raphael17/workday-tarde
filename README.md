@@ -1,3 +1,5 @@
+###
+
 CA Pharmacy is a system that controls pharmacy medication sales and stock. It consists of a frontend built with HTML, Bootstrap (CSS), and JavaScript, and an API developed using pure PHP. The frontend design is located in the `/design-system` directory. The database is a PostgreSQL instance. The frontend, backend, and database are all dockerized.
 
 The frontend talks to the API over HTTP/JSON — every page (dashboard, inventory, point of sale, prescriptions, patients, orders) reads and writes live data through the endpoints documented in `backend/README.md`.
