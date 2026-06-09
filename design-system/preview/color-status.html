@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html,body{margin:0}
+  body{background:var(--surface);font-family:var(--font-sans);padding:20px 24px;color:var(--fg)}
+  .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+  .col{display:flex;flex-direction:column;gap:8px}
+  .solid{height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--font-mono);font-size:10px}
+  .tint{height:26px;border-radius:6px;border:1px solid}
+  .lbl{font-size:11px;font-weight:600;color:var(--fg)}
+  .use{font-size:10px;color:var(--fg-subtle)}
+</style></head>
+<body>
+  <div class="grid">
+    <div class="col"><div class="solid" style="background:var(--success)">#0e8163</div><div class="tint" style="background:var(--success-bg);border-color:var(--success-bd)"></div><div class="lbl">Success</div><div class="use">In stock</div></div>
+    <div class="col"><div class="solid" style="background:var(--warning)">#b6730a</div><div class="tint" style="background:var(--warning-bg);border-color:var(--warning-bd)"></div><div class="lbl">Warning</div><div class="use">Low / expiring</div></div>
+    <div class="col"><div class="solid" style="background:var(--danger)">#c5403c</div><div class="tint" style="background:var(--danger-bg);border-color:var(--danger-bd)"></div><div class="lbl">Danger</div><div class="use">Out · expired</div></div>
+    <div class="col"><div class="solid" style="background:var(--info)">#2563c9</div><div class="tint" style="background:var(--info-bg);border-color:var(--info-bd)"></div><div class="lbl">Info</div><div class="use">System · rx</div></div>
+    <div class="col"><div class="solid" style="background:var(--controlled)">#6b3fb0</div><div class="tint" style="background:var(--controlled-bg);border-color:var(--controlled-bd)"></div><div class="lbl">Controlled</div><div class="use">Scheduled</div></div>
+  </div>
+</body></html>

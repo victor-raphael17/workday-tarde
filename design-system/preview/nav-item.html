@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html,body{margin:0}
+  body{background:var(--slate-900);font-family:var(--font-sans);padding:18px;color:var(--fg);display:flex;gap:18px}
+  .side{background:#10161e;border-radius:12px;padding:10px;width:210px;display:flex;flex-direction:column;gap:3px}
+  .item{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:8px;font-size:13.5px;font-weight:500;color:#aeb8c4;position:relative;cursor:pointer}
+  .item svg{width:18px;height:18px}
+  .item.active{background:rgba(56,183,141,.16);color:#6fd2af;font-weight:600}
+  .item.active::before{content:"";position:absolute;left:-10px;top:8px;bottom:8px;width:3px;border-radius:3px;background:var(--green-400)}
+  .item.hover{background:rgba(255,255,255,.05);color:#dfe5ec}
+  .legend{align-self:center;color:#67727f;font-family:var(--font-mono);font-size:11px}
+</style></head>
+<body>
+  <div class="side">
+    <div class="item active"><i data-lucide="layout-dashboard"></i>Dashboard</div>
+    <div class="item hover"><i data-lucide="package"></i>Inventory</div>
+    <div class="item"><i data-lucide="shopping-cart"></i>Point of sale</div>
+    <div class="item"><i data-lucide="clipboard-list"></i>Prescriptions</div>
+  </div>
+  <div class="legend">active · hover · default</div>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>lucide.createIcons();</script>
+</body></html>

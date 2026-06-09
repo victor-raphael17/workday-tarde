@@ -1,0 +1,8 @@
+# Route every request that is not a real file/directory through the front
+# controller so the PHP router can handle it.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>

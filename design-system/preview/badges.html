@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html,body{margin:0}
+  body{background:var(--surface);font-family:var(--font-sans);padding:22px 24px;color:var(--fg);display:flex;flex-wrap:wrap;gap:10px;align-content:flex-start}
+  .badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;border:1px solid;line-height:1.2}
+  .dot{width:6px;height:6px;border-radius:999px}
+  .s-in{background:var(--success-bg);color:var(--success);border-color:var(--success-bd)}
+  .s-low{background:var(--warning-bg);color:var(--warning);border-color:var(--warning-bd)}
+  .s-out{background:var(--danger-bg);color:var(--danger);border-color:var(--danger-bd)}
+  .s-exp{background:var(--warning-bg);color:var(--warning);border-color:var(--warning-bd)}
+  .s-expd{background:var(--danger-bg);color:var(--danger);border-color:var(--danger-bd)}
+  .s-rec{background:var(--danger);color:#fff;border-color:var(--danger)}
+  .s-ord{background:var(--info-bg);color:var(--info);border-color:var(--info-bd)}
+  .s-ctl{background:var(--controlled-bg);color:var(--controlled);border-color:var(--controlled-bd)}
+</style></head>
+<body>
+  <span class="badge s-in"><span class="dot" style="background:var(--success)"></span>In stock</span>
+  <span class="badge s-low"><span class="dot" style="background:var(--warning)"></span>Low stock</span>
+  <span class="badge s-out"><span class="dot" style="background:var(--danger)"></span>Out of stock</span>
+  <span class="badge s-exp"><span class="dot" style="background:var(--warning)"></span>Expiring soon</span>
+  <span class="badge s-expd"><span class="dot" style="background:var(--danger)"></span>Expired</span>
+  <span class="badge s-rec">Recalled</span>
+  <span class="badge s-ord"><span class="dot" style="background:var(--info)"></span>On order</span>
+  <span class="badge s-ctl">⬡ Controlled</span>
+</body></html>

@@ -1,0 +1,47 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ca_pharmacy
+      POSTGRES_USER: ca_pharmacy
+      POSTGRES_PASSWORD: ca_pharmacy
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./backend/database/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+      - ./backend/database/seed.sql:/docker-entrypoint-initdb.d/02_seed.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ca_pharmacy -d ca_pharmacy"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  api:
+    build:
+      context: ./backend
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      TAX_RATE: "0.05"
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_DATABASE: ca_pharmacy
+      DB_USERNAME: ca_pharmacy
+      DB_PASSWORD: ca_pharmacy
+    ports:
+      - "8080:80"
+    depends_on:
+      db:
+        condition: service_healthy
+  web:
+    build:
+      context: ./frontend
+      args:
+        # Baked into the bundle; the browser reaches the API on its published port.
+        VITE_API_BASE_URL: http://localhost:8080
+    ports:
+      - "4173:80"
+    depends_on:
+      - api
+volumes:
+  db_data:
