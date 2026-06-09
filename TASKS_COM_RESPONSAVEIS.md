@@ -20,9 +20,9 @@ Baseado no `TASKS.md`, no guia colado para **Backend Dev #1** e na divisao de de
 
 | Branch | Assignee | Reviewer | Status |
 | --- | --- | --- | --- |
-| `feature/frontend-tests-xss-clean` | Frontend Dev #4 - A definir | Frontend Dev #1 - Leonardo | Mergeado na `main`; testes/build validados |
-| `feature-add-eslint-and-prettier-configuration-with-documentation` | Frontend Dev #1 - Leonardo | Frontend Dev #4 - A definir | Em merge na `main`; lint/test/build em validacao |
-| `backend-dev-2-auth-router` | Backend Dev #2 - Domareski | Backend Dev #1 - Nicolas | Pendente para merge apos validar lint/frontend |
+| `feature/frontend-tests-xss-clean` | Frontend Dev #4 - A definir | licori12 | Mergeado na `main`; testes/build validados |
+| `feature-add-eslint-and-prettier-configuration-with-documentation` | Frontend Dev #1 - Leonardo | licori12 | Mergeado na `main`; lint/test/build validados |
+| `backend-dev-2-auth-router` | Backend Dev #2 - Domareski | licori12 | Mergeado na `main`; backend/auth, lint/test/build validados |
 
 ### Frontend Dev #4 - A definir
 

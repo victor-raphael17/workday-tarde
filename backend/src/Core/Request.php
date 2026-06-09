@@ -6,13 +6,7 @@ namespace App\Core;
 
 use App\Core\Exceptions\HttpException;
 
-/**
- * Immutable-ish snapshot of the incoming HTTP request.
- *
- * Exposes the method, normalized path, query parameters, parsed JSON body and
- * route parameters bound by the router (e.g. the {id} in /medications/{id}).
- */
-final class Request
+final class Request implements RequestInterface
 {
     /** @var array<string, string> */
     public array $params = [];
@@ -20,9 +14,12 @@ final class Request
     /** @var array<string, mixed>|null */
     private ?array $body = null;
 
+    /** @var array<string, mixed>|null */
+    private ?array $user = null;
+
     /**
      * @param array<string, mixed>  $query
-     * @param array<string, string> $headers Header name (lower-cased) => value.
+     * @param array<string, string> $headers
      */
     public function __construct(
         public readonly string $method,
@@ -36,7 +33,6 @@ final class Request
     public static function capture(): self
     {
         $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
-
         $uri = $_SERVER['REQUEST_URI'] ?? '/';
         $path = parse_url($uri, PHP_URL_PATH) ?: '/';
         $path = '/' . trim(rawurldecode($path), '/');
@@ -44,11 +40,6 @@ final class Request
         return new self($method, $path, $_GET, file_get_contents('php://input') ?: '', self::captureHeaders());
     }
 
-    /**
-     * Build a lower-cased header map from $_SERVER (works on any SAPI).
-     *
-     * @return array<string, string>
-     */
     private static function captureHeaders(): array
     {
         $headers = [];
@@ -60,7 +51,6 @@ final class Request
             }
         }
 
-        // Some SAPIs surface Authorization outside the HTTP_ prefix.
         if (!isset($headers['authorization']) && isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
             $headers['authorization'] = (string) $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
         }
@@ -73,7 +63,6 @@ final class Request
         return $this->headers[strtolower($name)] ?? $default;
     }
 
-    /** Extract the token from an `Authorization: Bearer <token>` header. */
     public function bearerToken(): ?string
     {
         $header = $this->header('authorization', '') ?? '';
@@ -85,11 +74,7 @@ final class Request
         return null;
     }
 
-    /**
-     * Decoded JSON body as an associative array.
-     *
-     * @return array<string, mixed>
-     */
+    /** @return array<string, mixed> */
     public function body(): array
     {
         if ($this->body !== null) {
@@ -122,5 +107,33 @@ final class Request
     public function param(string $key, mixed $default = null): mixed
     {
         return $this->params[$key] ?? $default;
+    }
+
+    /** @param array<string, mixed> $user */
+    public function setUser(array $user): void
+    {
+        $this->user = $user;
+    }
+
+    /** @return array<string, mixed>|null */
+    public function getUser(): ?array
+    {
+        return $this->user;
+    }
+
+    /** @return array<string, mixed>|null */
+    public function user(): ?array
+    {
+        return $this->user;
+    }
+
+    /** @return array<string, mixed> */
+    public function requireUser(): array
+    {
+        if ($this->user === null) {
+            throw new HttpException(401, 'Authentication required.');
+        }
+
+        return $this->user;
     }
 }
