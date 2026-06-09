@@ -4,26 +4,26 @@
  * these are hand-rolled to keep the bundle framework-light).
  */
 
-import { toneClass } from "./api.js";
-import { escapeHtml, escapeHtmlAttr } from "./sanitize.js";
+import { toneClass } from './api.js';
+import { escapeHtml, escapeHtmlAttr } from './sanitize.js';
 
 let toastHost = null;
 
-export function toast(message, tone = "info") {
+export function toast(message, tone = 'info') {
   if (!toastHost) {
-    toastHost = document.createElement("div");
-    toastHost.className = "toast-host";
+    toastHost = document.createElement('div');
+    toastHost.className = 'toast-host';
     document.body.appendChild(toastHost);
   }
 
-  const el = document.createElement("div");
+  const el = document.createElement('div');
   el.className = `toast-note toast-${tone}`;
   el.textContent = message;
   toastHost.appendChild(el);
 
-  requestAnimationFrame(() => el.classList.add("show"));
+  requestAnimationFrame(() => el.classList.add('show'));
   setTimeout(() => {
-    el.classList.remove("show");
+    el.classList.remove('show');
     setTimeout(() => el.remove(), 250);
   }, 3200);
 }
@@ -33,8 +33,8 @@ export function statusBadge(stateKey, label) {
 }
 
 /** Render a centered "empty" / "error" / "loading" placeholder string. */
-export function placeholder(message, tone = "muted") {
-  const cls = tone === "error" ? "text-danger" : "text-body-secondary";
+export function placeholder(message, tone = 'muted') {
+  const cls = tone === 'error' ? 'text-danger' : 'text-body-secondary';
   return `<div class="muted-note text-center w-100 py-4 ${cls}">${escapeHtml(message)}</div>`;
 }
 
@@ -44,42 +44,43 @@ export function placeholder(message, tone = "muted") {
  * `type` may be text | number | email | date | select | checkbox.
  * Resolves to a values object, or null if cancelled.
  */
-export function openForm({ title, fields, submitLabel = "Save" }) {
+export function openForm({ title, fields, submitLabel = 'Save' }) {
   return new Promise((resolve) => {
-    const overlay = document.createElement("div");
-    overlay.className = "modal-overlay";
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
 
     const renderField = (field) => {
       const id = `f_${field.name}`;
-      if (field.type === "select") {
+      if (field.type === 'select') {
         const options = (field.options || [])
           .map((opt) => {
-            const value = typeof opt === "string" ? opt : opt.value;
-            const label = typeof opt === "string" ? opt : opt.label;
-            const selected = String(field.value ?? "") === String(value) ? "selected" : "";
+            const value = typeof opt === 'string' ? opt : opt.value;
+            const label = typeof opt === 'string' ? opt : opt.label;
+            const selected =
+              String(field.value ?? '') === String(value) ? 'selected' : '';
             return `<option value="${escapeHtmlAttr(value)}" ${selected}>${escapeHtml(label)}</option>`;
           })
-          .join("");
+          .join('');
         return `
           <label class="modal-field">
-            <span>${escapeHtml(field.label)}${field.required ? " *" : ""}</span>
-            <select id="${escapeHtmlAttr(id)}" name="${escapeHtmlAttr(field.name)}" ${field.required ? "required" : ""}>${options}</select>
+            <span>${escapeHtml(field.label)}${field.required ? ' *' : ''}</span>
+            <select id="${escapeHtmlAttr(id)}" name="${escapeHtmlAttr(field.name)}" ${field.required ? 'required' : ''}>${options}</select>
           </label>`;
       }
-      if (field.type === "checkbox") {
+      if (field.type === 'checkbox') {
         return `
           <label class="modal-field modal-field-inline">
-            <input type="checkbox" id="${escapeHtmlAttr(id)}" name="${escapeHtmlAttr(field.name)}" ${field.value ? "checked" : ""}>
+            <input type="checkbox" id="${escapeHtmlAttr(id)}" name="${escapeHtmlAttr(field.name)}" ${field.value ? 'checked' : ''}>
             <span>${escapeHtml(field.label)}</span>
           </label>`;
       }
       return `
         <label class="modal-field">
-          <span>${escapeHtml(field.label)}${field.required ? " *" : ""}</span>
-          <input type="${escapeHtmlAttr(field.type || "text")}" id="${escapeHtmlAttr(id)}" name="${escapeHtmlAttr(field.name)}"
-            value="${escapeHtmlAttr(field.value ?? "")}" placeholder="${escapeHtmlAttr(field.placeholder || "")}"
-            ${field.required ? "required" : ""} ${field.step ? `step="${escapeHtmlAttr(field.step)}"` : ""}>
-          ${field.help ? `<small class="text-body-secondary">${escapeHtml(field.help)}</small>` : ""}
+          <span>${escapeHtml(field.label)}${field.required ? ' *' : ''}</span>
+          <input type="${escapeHtmlAttr(field.type || 'text')}" id="${escapeHtmlAttr(id)}" name="${escapeHtmlAttr(field.name)}"
+            value="${escapeHtmlAttr(field.value ?? '')}" placeholder="${escapeHtmlAttr(field.placeholder || '')}"
+            ${field.required ? 'required' : ''} ${field.step ? `step="${escapeHtmlAttr(field.step)}"` : ''}>
+          ${field.help ? `<small class="text-body-secondary">${escapeHtml(field.help)}</small>` : ''}
         </label>`;
     };
 
@@ -90,7 +91,7 @@ export function openForm({ title, fields, submitLabel = "Save" }) {
           <button type="button" class="modal-close" aria-label="Close">&times;</button>
         </div>
         <form class="modal-body">
-          ${fields.map(renderField).join("")}
+          ${fields.map(renderField).join('')}
           <div class="modal-actions">
             <button type="button" class="btn btn-outline-secondary btn-sm px-3" data-cancel>Cancel</button>
             <button type="submit" class="btn btn-success btn-sm px-3">${escapeHtml(submitLabel)}</button>
@@ -100,35 +101,40 @@ export function openForm({ title, fields, submitLabel = "Save" }) {
 
     const close = (result) => {
       overlay.remove();
-      document.removeEventListener("keydown", onKey);
+      document.removeEventListener('keydown', onKey);
       resolve(result);
     };
     const onKey = (e) => {
-      if (e.key === "Escape") {
+      if (e.key === 'Escape') {
         close(null);
       }
     };
 
-    overlay.querySelector(".modal-close").addEventListener("click", () => close(null));
-    overlay.querySelector("[data-cancel]").addEventListener("click", () => close(null));
-    overlay.addEventListener("mousedown", (e) => {
+    overlay
+      .querySelector('.modal-close')
+      .addEventListener('click', () => close(null));
+    overlay
+      .querySelector('[data-cancel]')
+      .addEventListener('click', () => close(null));
+    overlay.addEventListener('mousedown', (e) => {
       if (e.target === overlay) {
         close(null);
       }
     });
-    overlay.querySelector("form").addEventListener("submit", (e) => {
+    overlay.querySelector('form').addEventListener('submit', (e) => {
       e.preventDefault();
       const values = {};
       fields.forEach((field) => {
         const input = overlay.querySelector(`#f_${field.name}`);
-        values[field.name] = field.type === "checkbox" ? input.checked : input.value.trim();
+        values[field.name] =
+          field.type === 'checkbox' ? input.checked : input.value.trim();
       });
       close(values);
     });
 
-    document.addEventListener("keydown", onKey);
+    document.addEventListener('keydown', onKey);
     document.body.appendChild(overlay);
-    const first = overlay.querySelector("input, select");
+    const first = overlay.querySelector('input, select');
     if (first) {
       first.focus();
     }

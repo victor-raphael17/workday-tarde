@@ -20,9 +20,7 @@ describe('sanitize helpers', () => {
   });
 
   it('escapes ampersands and quotes', () => {
-    expect(escapeHtml('A & B "quoted"')).toBe(
-      'A &amp; B &quot;quoted&quot;'
-    );
+    expect(escapeHtml('A & B "quoted"')).toBe('A &amp; B &quot;quoted&quot;');
   });
 
   it('handles empty and nullish values', () => {
