@@ -42,6 +42,13 @@ final class Response
         return new self(null, 204);
     }
 
+    /** 429 Too Many Requests */
+    public static function tooManyRequests(mixed $data, int $retryAfter = 300): self
+    {
+        // Instancia a resposta passando os dados, o status 429 e o cabeçalho Retry-After
+        return new self($data, 429, ['Retry-After' => (string)$retryAfter]);
+    }
+
     public function send(): void
     {
         if (!headers_sent()) {
