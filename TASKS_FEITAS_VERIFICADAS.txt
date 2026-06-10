@@ -146,6 +146,22 @@ Arquivos:
 - `PROJECT_CONTEXT.md`
 - `TASKS_COM_RESPONSAVEIS.md`
 
+### Topbar global search e acoes
+
+Status: feito em `feature/topbar-global-actions`.
+
+Task/ajuste:
+- Implementar busca global da topbar para medicamentos, pacientes e prescricoes.
+- Ligar os botoes Notifications e Help, antes decorativos.
+- Adicionar testes unitarios para renderizacao e interacoes da topbar.
+
+Arquivos:
+- `frontend/assets/js/shell.js`
+- `frontend/assets/js/shell.test.js`
+- `frontend/assets/css/app.css`
+- `PROJECT_CONTEXT.md`
+- `TASKS_COM_RESPONSAVEIS.md`
+
 ## Ainda pendente
 
 - Completar cobertura de `api.js` para parsing de envelope de sucesso/erro.
@@ -153,8 +169,6 @@ Arquivos:
 - Resolver o parametro `reason` do ajuste de estoque.
 - Checagem proativa de expiracao do token no frontend.
 - Feedback offline/retry de rede.
-- Busca global na topbar.
-- Ligar ou remover botoes decorativos da topbar.
 - Externalizar identidade da filial.
 - Focus trap em modais.
 - `aria-live` em toasts/estados.

@@ -229,20 +229,30 @@ Atualizado conforme `main` em 2026-06-10.
 
 ### Frontend Dev #3 - Morozini
 
-- [ ] **Implementar busca global da topbar**
-  - Branch sugerida: `feature/topbar-global-search`.
-  - Arquivo:
+- [x] **Implementar busca global da topbar**
+  - Branch: `feature/topbar-global-actions`.
+  - Arquivos:
     - `frontend/assets/js/shell.js`
+    - `frontend/assets/js/shell.test.js`
+    - `frontend/assets/css/app.css`
   - Objetivo:
     - fazer o input da topbar buscar medicamentos, pacientes ou prescricoes.
+  - Resultado:
+    - busca global consulta medicamentos, pacientes e prescricoes.
+    - painel exibe resultados agrupados e navega para a area correspondente.
 
-- [ ] **Ligar ou remover botoes decorativos da topbar**
-  - Branch sugerida: `feature/topbar-actions`.
-  - Arquivo:
+- [x] **Ligar ou remover botoes decorativos da topbar**
+  - Branch: `feature/topbar-global-actions`.
+  - Arquivos:
     - `frontend/assets/js/shell.js`
+    - `frontend/assets/js/shell.test.js`
+    - `frontend/assets/css/app.css`
   - Botoes:
     - Notifications.
     - Help.
+  - Resultado:
+    - Notifications abre resumo acionavel do dashboard.
+    - Help abre atalhos e links rapidos.
 
 - [ ] **Externalizar identidade da filial**
   - Branch sugerida: `feature/branch-identity-api`.
