@@ -139,20 +139,93 @@ export function bindShellEvents() {
   scrim?.addEventListener('click', closeNav);
   links.forEach((link) => link.addEventListener('click', closeNav));
 
+  
   const searchInput = document.querySelector('.topbar-search input');
-
+  //Para caso seja uma div dinamica ou existente
+  const searchResultsContainer = document.querySelector('.topbar-search-results') || createSearchResultsContainer(); 
+  let debounceTimeout;
+  
+  //Atalho de foco no input '/' e 'Escape' para limpar
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
-      closeNav();
+     if (typeof closeNav === 'function') closeNav();
+     clearSearchResult();
     }
 
     const target = event.target;
     const isTyping =
       target instanceof HTMLElement &&
-      ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
+      ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName || target.isContentEditable
+    );
+
     if (event.key === '/' && !isTyping && searchInput) {
       event.preventDefault();
       searchInput.focus();
+    }
+  });
+  if (searchInput) {
+    searchInput.addEventListener('input', (event) => {
+    const query = event.target.value.trim();
+    clearTimeout(debounceTimeout);
+
+    //Para buscar com pelo menos 3 caracteres
+    if(query.lenght > 3) {
+      clearSearchResults();
+    return;
+    }
+  debounceTimeout = setTimeout(() => {
+      performGlobalSearch(query);
+    }, 300);
+  });
+}
+async function performGlobalSearch(query) {
+  try {
+    showSearchLoader();
+
+    // Substitua pela rota real da sua API
+    const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+    if (!response.ok) throw new Error('Erro ao buscar dados');
+    
+    const data = await response.json(); 
+    renderSearchResults(data);
+  } catch (error) {
+    console.error('Erro na busca global:', error);
+    renderSearchError();
+  }
+}
+
+function clearSearchResults() {
+    if (searchResultsContainer) {
+      searchResultsContainer.innerHTML = '';
+      searchResultsContainer.style.display = 'none';
+    }
+  }
+
+function showSearchLoader() {
+    if (searchResultsContainer) {
+      searchResultsContainer.style.display = 'block';
+      searchResultsContainer.innerHTML = '<div class="search-loading">Buscando...</div>';
+    }
+  }
+
+function renderSearchError() {
+    if (searchResultsContainer) {
+      searchResultsContainer.innerHTML = '<div class="search-error">Erro na busca. Tente novamente.</div>';
+    }
+  }
+
+function createSearchResultsContainer() {
+    if (!searchInput) return null;
+    const container = document.createElement('div');
+    container.className = 'topbar-search-results';
+    container.style.display = 'none';
+    searchInput.parentNode.appendChild(container);
+    return container;
+  }
+
+document.addEventListener('click', (e) => {
+    if (searchInput && searchResultsContainer && !searchInput.contains(e.target) && !searchResultsContainer.contains(e.target)) {
+      clearSearchResults();
     }
   });
 }
