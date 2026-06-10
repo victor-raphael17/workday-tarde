@@ -93,6 +93,23 @@ CREATE TRIGGER medications_updated_at
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 -- ---------------------------------------------------------------------------
+-- Stock Movements (audit log de ajustes de estoque)
+-- ---------------------------------------------------------------------------
+CREATE TABLE stock_movements (
+    id SERIAL PRIMARY KEY,
+    medication_id INTEGER NOT NULL REFERENCES medications (id) ON DELETE CASCADE,
+    delta INTEGER NOT NULL,
+    reason VARCHAR(160),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX stock_movements_medication_idx
+    ON stock_movements (medication_id);
+
+CREATE INDEX stock_movements_created_idx
+    ON stock_movements (created_at);
+
+-- ---------------------------------------------------------------------------
 -- Patients
 -- ---------------------------------------------------------------------------
 CREATE TABLE patients (
