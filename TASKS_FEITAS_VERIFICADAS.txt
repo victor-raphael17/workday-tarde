@@ -162,9 +162,24 @@ Arquivos:
 - `PROJECT_CONTEXT.md`
 - `TASKS_COM_RESPONSAVEIS.md`
 
+### Cobertura de parsing do cliente de API
+
+Status: feito em `feat-frontend-api-test`.
+
+Task/ajuste:
+- Completar cobertura de `api.js` para parsing de envelope de sucesso/erro.
+- Adicionar cobertura para falha de rede com `ApiError` status 0.
+
+Arquivo:
+- `frontend/assets/js/api.test.js`
+
+Validacao:
+- `npm test --workspace frontend -- --run`: passou com 44 testes.
+- `npm run lint:check --workspace frontend`: passou.
+- `npm run build --workspace frontend`: passou.
+
 ## Ainda pendente
 
-- Completar cobertura de `api.js` para parsing de envelope de sucesso/erro.
 - Pipeline de CI.
 - Resolver o parametro `reason` do ajuste de estoque.
 - Checagem proativa de expiracao do token no frontend.
