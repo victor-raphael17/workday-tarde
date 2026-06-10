@@ -4,7 +4,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>CA Pharmacy | Point of sale</title>
-    <meta name="description" content="Point of sale frontend for CA Pharmacy." />
+    <meta
+      name="description"
+      content="Point of sale frontend for CA Pharmacy."
+    />
     <link rel="icon" href="../assets/images/logo-mark.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -20,7 +23,10 @@
     />
     <link rel="stylesheet" href="../assets/css/theme.css" />
     <link rel="stylesheet" href="../assets/css/app.css" />
-    <script src="https://unpkg.com/lucide@1.17.0/dist/umd/lucide.min.js" defer></script>
+    <script
+      src="https://unpkg.com/lucide@1.17.0/dist/umd/lucide.min.js"
+      defer
+    ></script>
   </head>
   <body data-page="pos">
     <div class="app-scrim d-lg-none" id="appScrim"></div>
@@ -35,10 +41,17 @@
             <div>
               <span class="page-kicker">Cash register</span>
               <h1 class="page-title mb-1">Point of sale</h1>
-              <p class="page-subtitle mb-0">Register 1. Cashier: Jade Okafor.</p>
+              <p class="page-subtitle mb-0">
+                Register 1. Cashier: Jade Okafor.
+              </p>
             </div>
             <div class="d-flex flex-wrap gap-2">
-              <button class="btn btn-success btn-sm px-3" type="button" data-take-payment disabled>
+              <button
+                class="btn btn-success btn-sm px-3"
+                type="button"
+                data-take-payment
+                disabled
+              >
                 Take payment
               </button>
             </div>
@@ -54,7 +67,9 @@
                   data-scan-input
                   aria-label="Search or scan to add"
                 />
-                <kbd class="mono border rounded px-2 py-1 bg-body-tertiary">F2</kbd>
+                <kbd class="mono border rounded px-2 py-1 bg-body-tertiary"
+                  >F2</kbd
+                >
               </label>
 
               <div class="product-grid" data-product-grid></div>
@@ -67,7 +82,9 @@
                 >
                   <div>
                     <h2 class="section-title mb-1">Current sale</h2>
-                    <p class="section-subtitle mb-0">Adjust quantities before payment.</p>
+                    <p class="section-subtitle mb-0">
+                      Adjust quantities before payment.
+                    </p>
                   </div>
                   <button
                     class="btn btn-link btn-sm text-decoration-none px-0"
@@ -83,7 +100,9 @@
                     <i data-lucide="shield-alert"></i>
                     <div>
                       <strong>Controlled item in cart</strong>
-                      <p class="mono">Record this sale in the controlled substances register.</p>
+                      <p class="mono">
+                        Record this sale in the controlled substances register.
+                      </p>
                     </div>
                   </div>
                   <label class="modal-field mb-3">
@@ -97,15 +116,24 @@
                   <div class="detail-list">
                     <div class="detail-row">
                       <span class="detail-row-label">Subtotal</span
-                      ><span class="detail-row-value mono" data-pos="subtotal">$0.00</span>
+                      ><span class="detail-row-value mono" data-pos="subtotal"
+                        >$0.00</span
+                      >
                     </div>
                     <div class="detail-row">
                       <span class="detail-row-label">Tax (5%)</span
-                      ><span class="detail-row-value mono" data-pos="tax">$0.00</span>
+                      ><span class="detail-row-value mono" data-pos="tax"
+                        >$0.00</span
+                      >
                     </div>
                     <div class="detail-row">
-                      <span class="detail-row-label fw-semibold text-dark">Total</span
-                      ><span class="detail-row-value mono fw-bold" data-pos="total">$0.00</span>
+                      <span class="detail-row-label fw-semibold text-dark"
+                        >Total</span
+                      ><span
+                        class="detail-row-value mono fw-bold"
+                        data-pos="total"
+                        >$0.00</span
+                      >
                     </div>
                   </div>
                 </div>

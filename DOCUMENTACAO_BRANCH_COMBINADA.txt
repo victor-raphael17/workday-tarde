@@ -1,0 +1,76 @@
+Documentacao da branch combinada: feature/frontend-tests-xss-fixes
+
+Objetivo
+- Juntar as duas solucoes existentes:
+  - feature/frontend-4-tests: configuracao e primeiros testes unitarios do frontend.
+  - origin/feature/xss: helper inicial para escape contra XSS.
+- Completar a aplicacao do sanitizer no codigo principal, porque a branch XSS original so criava o helper e nao o usava nas telas vulneraveis.
+
+O que veio da branch de testes
+- frontend/package.json passou a ter scripts de teste:
+  - test
+  - test:ui
+  - test:coverage
+- frontend/vitest.config.js configura Vitest com ambiente jsdom.
+- frontend/assets/js/api.test.js cobre helpers de api.js e armazenamento de sessao.
+- frontend/assets/js/ui.test.js cobre helpers de UI, toast e openForm.
+- package-lock.json foi atualizado para registrar as dependencias de teste:
+  - vitest
+  - jsdom
+  - @vitest/ui
+  - @vitest/coverage-v8
+- frontend/vitest.config.js tambem fixa pool: "threads" para evitar timeout de workers forkados no WSL/projeto em /mnt/c.
+
+O que veio da branch XSS
+- frontend/assets/js/sanitize.js foi adicionado com helpers de escape.
+- frontend/assets/js/sanitize.test.js foi trazido da branch XSS, mas convertido de console.assert para Vitest.
+
+O que foi alterado para a branch XSS funcionar de verdade
+- sanitize.js agora aceita valores null, undefined e nao-string sem quebrar.
+- escapeHtmlAttr reutiliza o mesmo escape seguro de escapeHtml.
+- sanitize.test.js agora roda dentro da suite Vitest.
+- ui.js importa o sanitizer e escapa:
+  - labels de statusBadge;
+  - mensagens de placeholder;
+  - titulos, labels, valores, placeholders e opcoes de openForm.
+- shell.js importa o sanitizer e escapa:
+  - labels e hrefs da navegacao;
+  - nome, cargo, iniciais e filial exibidos no shell.
+- page-behaviors.js importa o sanitizer e escapa valores vindos da API antes de montar HTML com innerHTML:
+  - nomes de pacientes, medicamentos, fornecedores e prescritores;
+  - codigos, planos, categorias, doses, formas e unidades;
+  - datas formatadas, numeros e valores monetarios renderizados em tabelas/cards;
+  - atributos data-id, data-next e title onde havia interpolacao dinamica.
+
+Tasks do TASKS.md atendidas ou parcialmente atendidas
+- "Adicionar testes ao frontend (Vitest)": parcialmente/majoritariamente atendida.
+  - A suite Vitest existe e os testes foram adicionados.
+  - Ainda seria bom adicionar testes especificos para parsing do envelope de sucesso/erro em api.js, porque TASKS.md cita esse ponto explicitamente.
+- "Escapar dados da API antes de injetar via innerHTML (XSS)": atendida nesta branch combinada para os principais renderizadores atuais.
+  - A branch original XSS nao atendia sozinha, porque nao aplicava o helper.
+  - Esta branch aplica o escape em page-behaviors.js, shell.js e nos helpers de ui.js.
+
+Testes e verificacoes feitas
+- git diff --check: passou.
+- O ambiente foi corrigido instalando Node via nvm dentro do WSL:
+  - node: v20.20.2
+  - npm: 10.8.2
+- Como o node_modules tinha pacotes nativos do Windows, foi necessario instalar a dependencia nativa Linux do Rollup:
+  - npm install --no-save @rollup/rollup-linux-x64-gnu@4.61.1
+- A primeira execucao do Vitest falhou por timeout dos workers em pool "forks".
+- frontend/vitest.config.js foi ajustado para pool: "threads".
+- npm run test --workspace frontend -- --run: passou.
+  - Test Files: 3 passed
+  - Tests: 31 passed
+- npm run build: passou.
+
+Como rodar
+- Dentro da branch feature/frontend-tests-xss-fixes, com o nvm carregado:
+  - source /home/guilh/.nvm/nvm.sh
+  - npm install
+  - npm run test --workspace frontend -- --run
+  - npm run build
+
+Observacoes importantes antes de merge
+- Incluir package-lock.json no commit da branch combinada, porque ele registra as dependencias necessarias para os testes.
+- Avaliar se os diretorios gerados frontend/coverage e frontend/html devem mesmo ficar versionados. Eles vieram da branch de testes, mas normalmente cobertura/build gerado nao fica no Git, a menos que seja decisao do projeto.

@@ -7,6 +7,14 @@
   "scripts": {
     "dev": "npm run dev --workspace frontend",
     "build": "npm run build --workspace frontend",
-    "preview": "npm run preview --workspace frontend"
+    "preview": "npm run preview --workspace frontend",
+    "test": "npm run test --workspace frontend",
+    "lint": "npm run lint --workspace frontend",
+    "lint:check": "npm run lint:check --workspace frontend",
+    "format": "npm run format --workspace frontend"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "globals": "^17.6.0"
   }
 }

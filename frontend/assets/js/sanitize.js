@@ -1,13 +1,13 @@
 const HTML_ESCAPE = {
-  "&": "&amp;",
-  "<": "&lt;",
-  ">": "&gt;",
-  '"': "&quot;",
-  "'": "&#39;",
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;',
 };
 
 function normalize(value) {
-  return value === null || value === undefined ? "" : String(value);
+  return value === null || value === undefined ? '' : String(value);
 }
 
 /**

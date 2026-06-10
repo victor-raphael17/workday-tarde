@@ -1,63 +1,42 @@
-import { describe, expect, it } from "vitest";
-import { escapeHtml, escapeHtmlAttr } from "./sanitize.js";
+import { describe, expect, it } from 'vitest';
 
-describe("sanitize.js", () => {
-  describe("escapeHtml", () => {
-    it("escapes HTML tags", () => {
-      expect(escapeHtml("<img>")).toBe("&lt;img&gt;");
-      expect(escapeHtml("<script>alert('xss')</script>")).toContain("&lt;script&gt;");
-    });
+import { escapeHtml, escapeHtmlAttr } from './sanitize.js';
 
-    it("escapes script payloads as text", () => {
-      expect(escapeHtml("<script>alert('xss')</script>")).toBe(
-        "&lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;",
-      );
-    });
-
-    it("escapes event-handler payloads without leaving raw tags or quotes", () => {
-      const escaped = escapeHtml('<img src=x onerror="alert()">');
-
-      expect(escaped).toBe("&lt;img src=x onerror=&quot;alert()&quot;&gt;");
-      expect(escaped).not.toContain("<img");
-      expect(escaped).not.toContain('"');
-    });
-
-    it("escapes ampersands", () => {
-      expect(escapeHtml("A & B")).toBe("A &amp; B");
-    });
-
-    it("escapes double and single quotes", () => {
-      expect(escapeHtml('He said "hello" and it\'s ok')).toBe(
-        "He said &quot;hello&quot; and it&#39;s ok",
-      );
-    });
-
-    it("handles null, undefined, and empty values", () => {
-      expect(escapeHtml(null)).toBe("");
-      expect(escapeHtml(undefined)).toBe("");
-      expect(escapeHtml("")).toBe("");
-    });
-
-    it("preserves safe text and stringifies primitive values", () => {
-      expect(escapeHtml("Hello World 123")).toBe("Hello World 123");
-      expect(escapeHtml(0)).toBe("0");
-      expect(escapeHtml(false)).toBe("false");
-    });
+describe('sanitize helpers', () => {
+  it('escapes HTML tags', () => {
+    expect(escapeHtml('<img>')).toBe('&lt;img&gt;');
   });
 
-  describe("escapeHtmlAttr", () => {
-    it("escapes attribute values", () => {
-      const escaped = escapeHtmlAttr('value with "quotes"');
+  it('escapes script payloads', () => {
+    expect(escapeHtml("<script>alert('xss')</script>")).toBe(
+      '&lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;'
+    );
+  });
 
-      expect(escaped).toContain("&quot;");
-    });
+  it('escapes image event-handler payloads as text', () => {
+    expect(escapeHtml('<img src=x onerror="alert()">')).toBe(
+      '&lt;img src=x onerror=&quot;alert()&quot;&gt;'
+    );
+  });
 
-    it("escapes single quotes", () => {
-      expect(escapeHtmlAttr("it's")).toContain("&#39;");
-    });
+  it('escapes ampersands and quotes', () => {
+    expect(escapeHtml('A & B "quoted"')).toBe('A &amp; B &quot;quoted&quot;');
+  });
 
-    it("escapes ampersands in attributes", () => {
-      expect(escapeHtmlAttr("a&b")).toBe("a&amp;b");
-    });
+  it('handles empty and nullish values', () => {
+    expect(escapeHtml('')).toBe('');
+    expect(escapeHtml(null)).toBe('');
+    expect(escapeHtml(undefined)).toBe('');
+  });
+
+  it('preserves non-string values as escaped text', () => {
+    expect(escapeHtml(0)).toBe('0');
+    expect(escapeHtml(false)).toBe('false');
+  });
+
+  it('escapes quotes for attribute contexts', () => {
+    expect(escapeHtmlAttr('" onclick="alert(1)" data-test=\'x\'')).toBe(
+      '&quot; onclick=&quot;alert(1)&quot; data-test=&#39;x&#39;'
+    );
   });
 });

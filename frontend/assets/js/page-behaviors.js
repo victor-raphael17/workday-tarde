@@ -1,5 +1,13 @@
-import { api, ApiError, currency, formatDate, initials, toneClass } from "./api.js";
-import { openForm, placeholder, statusBadge, toast } from "./ui.js";
+import {
+  api,
+  ApiError,
+  currency,
+  formatDate,
+  initials,
+  toneClass,
+} from './api.js';
+import { openForm, placeholder, statusBadge, toast } from './ui.js';
+import { escapeHtml, escapeHtmlAttr } from './sanitize.js';
 
 const POS_TAX_RATE = 0.05; // mirrors the API's TAX_RATE for the live cart preview
 
@@ -11,15 +19,15 @@ function refreshIcons() {
 
 function timeAgo(iso) {
   if (!iso) {
-    return "";
+    return '';
   }
-  const then = new Date(String(iso).replace(" ", "T"));
+  const then = new Date(String(iso).replace(' ', 'T'));
   const diffMin = Math.round((Date.now() - then.getTime()) / 60000);
   if (Number.isNaN(diffMin)) {
-    return "";
+    return '';
   }
   if (diffMin < 1) {
-    return "just now";
+    return 'just now';
   }
   if (diffMin < 60) {
     return `${diffMin} min ago`;
@@ -32,8 +40,9 @@ function timeAgo(iso) {
 }
 
 function reportError(error) {
-  const message = error instanceof ApiError ? error.message : "Something went wrong.";
-  toast(message, "error");
+  const message =
+    error instanceof ApiError ? error.message : 'Something went wrong.';
+  toast(message, 'error');
   return message;
 }
 
@@ -58,20 +67,26 @@ async function bindDashboard() {
   }
 
   const sales = summary.sales_today;
-  set("sales-total", currency.format(sales.total));
-  set("sales-count", sales.count);
-  set("sales-avg", `avg ${currency.format(sales.count ? sales.total / sales.count : 0)} / sale`);
-  set("queue", summary.dispensing_queue.open);
-  set("queue-sub", `${summary.dispensing_queue.verifying} awaiting verification`);
-  set("low-stock", summary.alerts.low_stock);
+  set('sales-total', currency.format(sales.total));
+  set('sales-count', sales.count);
+  set(
+    'sales-avg',
+    `avg ${currency.format(sales.count ? sales.total / sales.count : 0)} / sale`
+  );
+  set('queue', summary.dispensing_queue.open);
+  set(
+    'queue-sub',
+    `${summary.dispensing_queue.verifying} awaiting verification`
+  );
+  set('low-stock', summary.alerts.low_stock);
 
   // Weekly sales chart
-  const chart = document.querySelector("[data-sales-chart]");
+  const chart = document.querySelector('[data-sales-chart]');
   if (chart) {
     const week = summary.sales_week || [];
     const max = Math.max(1, ...week.map((d) => d.total));
     const total = week.reduce((sum, d) => sum + d.total, 0);
-    const totalEl = document.querySelector("[data-sales-week-total]");
+    const totalEl = document.querySelector('[data-sales-week-total]');
     if (totalEl) {
       totalEl.textContent = `${currency.format(total)} total`;
     }
@@ -79,52 +94,58 @@ async function bindDashboard() {
       ? week
           .map((d) => {
             const height = Math.max(6, Math.round((d.total / max) * 100));
-            const peak = d.total === max && total > 0 ? "sales-bar-peak" : "";
-            const label = new Date(`${d.date}T00:00:00`).toLocaleDateString("en-US", {
-              weekday: "short",
-            });
-            return `<div class="sales-bar-col"><div class="sales-bar ${peak}" style="height:${height}%" title="${currency.format(d.total)}"></div><span class="mono">${label}</span></div>`;
+            const peak = d.total === max && total > 0 ? 'sales-bar-peak' : '';
+            const label = new Date(`${d.date}T00:00:00`).toLocaleDateString(
+              'en-US',
+              { weekday: 'short' }
+            );
+            return `<div class="sales-bar-col"><div class="sales-bar ${peak}" style="height:${height}%" title="${escapeHtmlAttr(currency.format(d.total))}"></div><span class="mono">${escapeHtml(label)}</span></div>`;
           })
-          .join("")
-      : placeholder("No sales recorded this week.");
+          .join('')
+      : placeholder('No sales recorded this week.');
   }
 
   // Attention list (low stock / out / expiring)
-  const attention = document.querySelector("[data-attention-list]");
+  const attention = document.querySelector('[data-attention-list]');
   if (attention) {
     const items = (summary.low_stock || []).slice(0, 5);
     attention.innerHTML = items.length
       ? items
           .map((m) => {
-            const tone = m.controlled ? "controlled" : m.status;
-            const label = m.controlled ? "Controlled" : m.status_label;
+            const tone = m.controlled ? 'controlled' : m.status;
+            const label = m.controlled ? 'Controlled' : m.status_label;
             const note = m.controlled
               ? `${m.on_hand} on hand. Controlled substance.`
               : `${m.on_hand} on hand. Reorder at ${m.reorder_point}.`;
-            const icon = m.status === "out" ? "package-x" : m.controlled ? "shield-alert" : "pill";
-            const avatarMod = m.controlled ? "status-avatar-controlled" : "";
+            const icon =
+              m.status === 'out'
+                ? 'package-x'
+                : m.controlled
+                  ? 'shield-alert'
+                  : 'pill';
+            const avatarMod = m.controlled ? 'status-avatar-controlled' : '';
             return `
               <div class="list-group-item border-0 px-4 py-3">
                 <div class="d-flex align-items-center gap-3">
                   <span class="status-avatar ${avatarMod}"><i data-lucide="${icon}"></i></span>
                   <div class="flex-grow-1">
-                    <div class="fw-semibold">${m.name} ${m.strength || ""}</div>
-                    <div class="small text-body-secondary mono">${note}</div>
+                    <div class="fw-semibold">${escapeHtml(m.name)} ${escapeHtml(m.strength || '')}</div>
+                    <div class="small text-body-secondary mono">${escapeHtml(note)}</div>
                   </div>
                   ${statusBadge(tone, label)}
                 </div>
               </div>`;
           })
-          .join("")
-      : placeholder("Nothing needs attention. Stock levels look healthy.");
+          .join('')
+      : placeholder('Nothing needs attention. Stock levels look healthy.');
   }
 
   // Dispensing queue table
-  const queueBody = document.querySelector("[data-dispense-queue]");
+  const queueBody = document.querySelector('[data-dispense-queue]');
   if (queueBody) {
     try {
       const scripts = (await api.prescriptions()).filter((rx) =>
-        ["new", "verifying", "ready"].includes(rx.state),
+        ['new', 'verifying', 'ready'].includes(rx.state)
       );
       queueBody.innerHTML = scripts.length
         ? scripts
@@ -132,33 +153,35 @@ async function bindDashboard() {
             .map((rx) => {
               const flag = rx.flag
                 ? statusBadge(
-                    rx.flag === "controlled" ? "controlled" : "out",
-                    rx.flag[0].toUpperCase() + rx.flag.slice(1),
+                    rx.flag === 'controlled' ? 'controlled' : 'out',
+                    rx.flag[0].toUpperCase() + rx.flag.slice(1)
                   )
-                : '<span class="text-body-secondary small">None</span>';
+                : `<span class="text-body-secondary small">None</span>`;
               const stateLabel = rx.state[0].toUpperCase() + rx.state.slice(1);
-              const avatarMod = rx.medication.controlled ? "table-avatar-controlled" : "";
+              const avatarMod = rx.medication.controlled
+                ? 'table-avatar-controlled'
+                : '';
               return `
                 <tr>
                   <td>
                     <div class="d-flex align-items-center gap-3">
-                      <span class="table-avatar ${avatarMod}">${initials(rx.patient.name)}</span>
+                      <span class="table-avatar ${avatarMod}">${escapeHtml(initials(rx.patient.name))}</span>
                       <div>
-                        <div class="fw-semibold">${rx.patient.name}</div>
-                        <div class="small text-body-secondary mono">${rx.code}</div>
+                        <div class="fw-semibold">${escapeHtml(rx.patient.name)}</div>
+                        <div class="small text-body-secondary mono">${escapeHtml(rx.code)}</div>
                       </div>
                     </div>
                   </td>
-                  <td>${rx.medication.name} ${rx.medication.strength || ""}</td>
-                  <td>${rx.prescriber}</td>
+                  <td>${escapeHtml(rx.medication.name)} ${escapeHtml(rx.medication.strength || '')}</td>
+                  <td>${escapeHtml(rx.prescriber)}</td>
                   <td>${flag}</td>
                   <td>${statusBadge(rx.state, stateLabel)}</td>
                 </tr>`;
             })
-            .join("")
-        : `<tr><td colspan="5">${placeholder("The dispensing queue is clear.")}</td></tr>`;
+            .join('')
+        : `<tr><td colspan="5">${placeholder('The dispensing queue is clear.')}</td></tr>`;
     } catch (error) {
-      queueBody.innerHTML = `<tr><td colspan="5">${placeholder(reportError(error), "error")}</td></tr>`;
+      queueBody.innerHTML = `<tr><td colspan="5">${placeholder(reportError(error), 'error')}</td></tr>`;
     }
   }
 
@@ -170,10 +193,10 @@ async function bindDashboard() {
 // ---------------------------------------------------------------------------
 
 async function bindInventory() {
-  const tbody = document.querySelector("[data-inventory-body]");
-  const search = document.querySelector("[data-inventory-search]");
-  const chips = Array.from(document.querySelectorAll("[data-stock-filter]"));
-  const addButton = document.querySelector("[data-add-medication]");
+  const tbody = document.querySelector('[data-inventory-body]');
+  const search = document.querySelector('[data-inventory-search]');
+  const chips = Array.from(document.querySelectorAll('[data-stock-filter]'));
+  const addButton = document.querySelector('[data-add-medication]');
   if (!tbody) {
     return;
   }
@@ -190,33 +213,37 @@ async function bindInventory() {
   const receiveChip = document.querySelector("[data-detail-action='receive']");
 
   let medications = [];
-  let activeFilter = "all";
+  let activeFilter = 'all';
   let selectedId = null;
 
   const matchesFilter = (m) => {
-    if (activeFilter === "low") {
-      return m.status === "low" || m.status === "out";
+    if (activeFilter === 'low') {
+      return m.status === 'low' || m.status === 'out';
     }
-    if (activeFilter === "expiring") {
-      return m.status === "expiring" || m.status === "expired";
+    if (activeFilter === 'expiring') {
+      return m.status === 'expiring' || m.status === 'expired';
     }
-    if (activeFilter === "controlled") {
+    if (activeFilter === 'controlled') {
       return m.controlled;
     }
     return true;
   };
 
   const matchesSearch = (m) => {
-    const term = (search?.value || "").trim().toLowerCase();
+    const term = (search?.value || '').trim().toLowerCase();
     if (!term) {
       return true;
     }
-    return [m.name, m.sku, m.category].filter(Boolean).join(" ").toLowerCase().includes(term);
+    return [m.name, m.sku, m.category]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase()
+      .includes(term);
   };
 
   const badgeFor = (m) =>
     m.controlled
-      ? { tone: "controlled", label: "Controlled" }
+      ? { tone: 'controlled', label: 'Controlled' }
       : { tone: m.status, label: m.status_label };
 
   const renderDetail = (m) => {
@@ -226,7 +253,7 @@ async function bindInventory() {
     detailFields.title.textContent = m.name;
     detailFields.subtitle.textContent = [m.strength, m.form, m.category]
       .filter(Boolean)
-      .join(" · ");
+      .join(' · ');
     detailFields.onHand.textContent = `${m.on_hand} packs`;
     detailFields.reorder.textContent = `${m.reorder_point} packs`;
     detailFields.expiry.textContent = formatDate(m.expiry);
@@ -245,7 +272,7 @@ async function bindInventory() {
       return n;
     };
     chips.forEach((chip) => {
-      const countEl = chip.querySelector(".mono");
+      const countEl = chip.querySelector('.mono');
       if (countEl) {
         countEl.textContent = count(chip.dataset.stockFilter);
       }
@@ -253,7 +280,9 @@ async function bindInventory() {
   };
 
   const render = () => {
-    const visible = medications.filter((m) => matchesFilter(m) && matchesSearch(m));
+    const visible = medications.filter(
+      (m) => matchesFilter(m) && matchesSearch(m)
+    );
     if (!visible.some((m) => m.id === selectedId)) {
       selectedId = visible.length ? visible[0].id : null;
     }
@@ -262,36 +291,36 @@ async function bindInventory() {
       ? visible
           .map((m) => {
             const badge = badgeFor(m);
-            const active = m.id === selectedId ? "table-active" : "";
+            const active = m.id === selectedId ? 'table-active' : '';
             const expiryClass =
-              m.status === "expiring" || m.status === "expired"
-                ? "text-warning-emphasis"
-                : "text-body-secondary";
+              m.status === 'expiring' || m.status === 'expired'
+                ? 'text-warning-emphasis'
+                : 'text-body-secondary';
             return `
-              <tr data-inventory-row data-id="${m.id}" class="${active}" role="button" tabindex="0">
-                <td><div class="fw-semibold">${m.name}</div><div class="small text-body-secondary">${[m.strength, m.form].filter(Boolean).join(" · ")}</div></td>
-                <td class="mono text-body-secondary">${m.sku}</td>
-                <td>${m.category || "—"}</td>
-                <td class="text-end mono">${m.on_hand}</td>
-                <td class="mono ${expiryClass}">${formatDate(m.expiry)}</td>
+              <tr data-inventory-row data-id="${escapeHtmlAttr(m.id)}" class="${active}" role="button" tabindex="0">
+                <td><div class="fw-semibold">${escapeHtml(m.name)}</div><div class="small text-body-secondary">${escapeHtml([m.strength, m.form].filter(Boolean).join(' · '))}</div></td>
+                <td class="mono text-body-secondary">${escapeHtml(m.sku)}</td>
+                <td>${escapeHtml(m.category || '—')}</td>
+                <td class="text-end mono">${escapeHtml(m.on_hand)}</td>
+                <td class="mono ${expiryClass}">${escapeHtml(formatDate(m.expiry))}</td>
                 <td>${statusBadge(badge.tone, badge.label)}</td>
-                <td class="text-end mono">${currency.format(m.price)}</td>
+                <td class="text-end mono">${escapeHtml(currency.format(m.price))}</td>
               </tr>`;
           })
-          .join("")
-      : `<tr><td colspan="7">${placeholder("No medications match your filters.")}</td></tr>`;
+          .join('')
+      : `<tr><td colspan="7">${placeholder('No medications match your filters.')}</td></tr>`;
 
-    tbody.querySelectorAll("[data-inventory-row]").forEach((row) => {
+    tbody.querySelectorAll('[data-inventory-row]').forEach((row) => {
       const select = () => {
         selectedId = Number(row.dataset.id);
         tbody
-          .querySelectorAll("[data-inventory-row]")
-          .forEach((r) => r.classList.toggle("table-active", r === row));
+          .querySelectorAll('[data-inventory-row]')
+          .forEach((r) => r.classList.toggle('table-active', r === row));
         renderDetail(medications.find((m) => m.id === selectedId));
       };
-      row.addEventListener("click", select);
-      row.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
+      row.addEventListener('click', select);
+      row.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           select();
         }
@@ -303,40 +332,56 @@ async function bindInventory() {
   };
 
   const load = async () => {
-    tbody.innerHTML = `<tr><td colspan="7">${placeholder("Loading inventory…")}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7">${placeholder('Loading inventory…')}</td></tr>`;
     try {
       medications = await api.medications();
       updateChipCounts();
       render();
     } catch (error) {
-      tbody.innerHTML = `<tr><td colspan="7">${placeholder(reportError(error), "error")}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7">${placeholder(reportError(error), 'error')}</td></tr>`;
     }
   };
 
   chips.forEach((chip) => {
-    chip.addEventListener("click", () => {
+    chip.addEventListener('click', () => {
       activeFilter = chip.dataset.stockFilter;
-      chips.forEach((c) => c.classList.toggle("active", c === chip));
+      chips.forEach((c) => c.classList.toggle('active', c === chip));
       render();
     });
   });
-  search?.addEventListener("input", render);
+  search?.addEventListener('input', render);
 
-  addButton?.addEventListener("click", async () => {
+  addButton?.addEventListener('click', async () => {
     const values = await openForm({
-      title: "Add medication",
-      submitLabel: "Create",
+      title: 'Add medication',
+      submitLabel: 'Create',
       fields: [
-        { name: "sku", label: "SKU", required: true, placeholder: "CA-XXX-000" },
-        { name: "name", label: "Name", required: true },
-        { name: "strength", label: "Strength", placeholder: "500 mg" },
-        { name: "form", label: "Form", placeholder: "Tablet" },
-        { name: "category", label: "Category" },
-        { name: "on_hand", label: "On hand", type: "number", value: 0 },
-        { name: "reorder_point", label: "Reorder point", type: "number", value: 0 },
-        { name: "price", label: "Unit price", type: "number", step: "0.01", value: 0 },
-        { name: "expiry", label: "Expiry", type: "date" },
-        { name: "controlled", label: "Controlled substance", type: "checkbox" },
+        {
+          name: 'sku',
+          label: 'SKU',
+          required: true,
+          placeholder: 'CA-XXX-000',
+        },
+        { name: 'name', label: 'Name', required: true },
+        { name: 'strength', label: 'Strength', placeholder: '500 mg' },
+        { name: 'form', label: 'Form', placeholder: 'Tablet' },
+        { name: 'category', label: 'Category' },
+        { name: 'on_hand', label: 'On hand', type: 'number', value: 0 },
+        {
+          name: 'reorder_point',
+          label: 'Reorder point',
+          type: 'number',
+          value: 0,
+        },
+        {
+          name: 'price',
+          label: 'Unit price',
+          type: 'number',
+          step: '0.01',
+          value: 0,
+        },
+        { name: 'expiry', label: 'Expiry', type: 'date' },
+        { name: 'controlled', label: 'Controlled substance', type: 'checkbox' },
       ],
     });
     if (!values) {
@@ -355,31 +400,35 @@ async function bindInventory() {
         expiry: values.expiry || null,
         controlled: values.controlled,
       });
-      toast(`${values.name} added to inventory.`, "success");
+      toast(`${values.name} added to inventory.`, 'success');
       await load();
     } catch (error) {
       reportError(error);
     }
   });
 
-  receiveChip?.addEventListener("click", async () => {
+  receiveChip?.addEventListener('click', async () => {
     const m = medications.find((x) => x.id === selectedId);
     if (!m) {
       return;
     }
     const values = await openForm({
       title: `Adjust stock — ${m.name}`,
-      submitLabel: "Apply",
+      submitLabel: 'Apply',
       fields: [
         {
-          name: "delta",
-          label: "Change (use a negative number to remove)",
-          type: "number",
+          name: 'delta',
+          label: 'Change (use a negative number to remove)',
+          type: 'number',
           required: true,
           value: 0,
           help: `Currently ${m.on_hand} on hand.`,
         },
-        { name: "reason", label: "Reason", placeholder: "Goods-in / correction / write-off" },
+        {
+          name: 'reason',
+          label: 'Reason',
+          placeholder: 'Goods-in / correction / write-off',
+        },
       ],
     });
     if (!values) {
@@ -391,7 +440,7 @@ async function bindInventory() {
     }
     try {
       await api.adjustStock(m.id, delta, values.reason || null);
-      toast(`Stock updated for ${m.name}.`, "success");
+      toast(`Stock updated for ${m.name}.`, 'success');
       await load();
     } catch (error) {
       reportError(error);
@@ -406,16 +455,18 @@ async function bindInventory() {
 // ---------------------------------------------------------------------------
 
 async function bindPos() {
-  const grid = document.querySelector("[data-product-grid]");
-  const list = document.querySelector("[data-cart-list]");
-  const scanInput = document.querySelector("[data-scan-input]");
+  const grid = document.querySelector('[data-product-grid]');
+  const list = document.querySelector('[data-cart-list]');
+  const scanInput = document.querySelector('[data-scan-input]');
   const subtotalEl = document.querySelector("[data-pos='subtotal']");
   const taxEl = document.querySelector("[data-pos='tax']");
   const totalEl = document.querySelector("[data-pos='total']");
-  const controlledEl = document.querySelector("[data-pos='controlled-warning']");
-  const clearButton = document.querySelector("[data-cart-clear]");
-  const payButton = document.querySelector("[data-take-payment]");
-  const methodSelect = document.querySelector("[data-payment-method]");
+  const controlledEl = document.querySelector(
+    "[data-pos='controlled-warning']"
+  );
+  const clearButton = document.querySelector('[data-cart-clear]');
+  const payButton = document.querySelector('[data-take-payment]');
+  const methodSelect = document.querySelector('[data-payment-method]');
   if (!grid || !list) {
     return;
   }
@@ -426,28 +477,30 @@ async function bindPos() {
   const stockFor = (id) => products.find((p) => p.id === id)?.on_hand ?? 0;
 
   const renderProducts = () => {
-    const sellable = products.filter((p) => p.status !== "expired" && p.status !== "recalled");
+    const sellable = products.filter(
+      (p) => p.status !== 'expired' && p.status !== 'recalled'
+    );
     grid.innerHTML = sellable.length
       ? sellable
           .map((p) => {
-            const icon = p.controlled ? "shield-alert" : "pill";
-            const out = p.on_hand <= 0 ? "product-card-disabled" : "";
+            const icon = p.controlled ? 'shield-alert' : 'pill';
+            const out = p.on_hand <= 0 ? 'product-card-disabled' : '';
             return `
-              <article class="product-card p-3 ${out}" data-product data-id="${p.id}" role="button" tabindex="0">
-                <div class="d-flex justify-content-between gap-3 align-items-start mb-2"><div class="product-title">${p.name}</div><i data-lucide="${icon}"></i></div>
-                <div class="product-meta">${[p.strength, p.form].filter(Boolean).join(" · ")}</div>
-                <div class="d-flex justify-content-between gap-2 align-items-center mt-3"><span class="product-price mono">${currency.format(p.price)}</span><span class="product-meta mono">${p.on_hand} left</span></div>
+              <article class="product-card p-3 ${out}" data-product data-id="${escapeHtmlAttr(p.id)}" role="button" tabindex="0">
+                <div class="d-flex justify-content-between gap-3 align-items-start mb-2"><div class="product-title">${escapeHtml(p.name)}</div><i data-lucide="${escapeHtmlAttr(icon)}"></i></div>
+                <div class="product-meta">${escapeHtml([p.strength, p.form].filter(Boolean).join(' · '))}</div>
+                <div class="d-flex justify-content-between gap-2 align-items-center mt-3"><span class="product-price mono">${escapeHtml(currency.format(p.price))}</span><span class="product-meta mono">${escapeHtml(p.on_hand)} left</span></div>
               </article>`;
           })
-          .join("")
-      : placeholder("No products available to sell.");
+          .join('')
+      : placeholder('No products available to sell.');
 
-    grid.querySelectorAll("[data-product]").forEach((card) => {
+    grid.querySelectorAll('[data-product]').forEach((card) => {
       const id = Number(card.dataset.id);
       const activate = () => addToCart(id);
-      card.addEventListener("click", activate);
-      card.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
+      card.addEventListener('click', activate);
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           activate();
         }
@@ -457,38 +510,38 @@ async function bindPos() {
   };
 
   const buildRow = (item, index) => {
-    const row = document.createElement("div");
-    row.className = "cart-row";
+    const row = document.createElement('div');
+    row.className = 'cart-row';
 
-    const info = document.createElement("div");
-    info.className = "flex-grow-1";
-    const title = document.createElement("div");
-    title.className = "cart-item-title";
+    const info = document.createElement('div');
+    info.className = 'flex-grow-1';
+    const title = document.createElement('div');
+    title.className = 'cart-item-title';
     title.textContent = item.name;
-    const meta = document.createElement("div");
-    meta.className = "cart-item-meta mono";
+    const meta = document.createElement('div');
+    meta.className = 'cart-item-meta mono';
     meta.textContent = `${currency.format(item.price)} each`;
     info.append(title, meta);
 
-    const stepper = document.createElement("div");
-    stepper.className = "stepper";
-    const decrease = document.createElement("button");
-    decrease.type = "button";
-    decrease.textContent = "-";
-    decrease.setAttribute("aria-label", `Decrease ${item.name}`);
-    decrease.addEventListener("click", () => changeQty(index, -1));
-    const qty = document.createElement("span");
-    qty.className = "stepper-value";
+    const stepper = document.createElement('div');
+    stepper.className = 'stepper';
+    const decrease = document.createElement('button');
+    decrease.type = 'button';
+    decrease.textContent = '-';
+    decrease.setAttribute('aria-label', `Decrease ${item.name}`);
+    decrease.addEventListener('click', () => changeQty(index, -1));
+    const qty = document.createElement('span');
+    qty.className = 'stepper-value';
     qty.textContent = item.qty;
-    const increase = document.createElement("button");
-    increase.type = "button";
-    increase.textContent = "+";
-    increase.setAttribute("aria-label", `Increase ${item.name}`);
-    increase.addEventListener("click", () => changeQty(index, 1));
+    const increase = document.createElement('button');
+    increase.type = 'button';
+    increase.textContent = '+';
+    increase.setAttribute('aria-label', `Increase ${item.name}`);
+    increase.addEventListener('click', () => changeQty(index, 1));
     stepper.append(decrease, qty, increase);
 
-    const lineTotal = document.createElement("div");
-    lineTotal.className = "mono fw-semibold";
+    const lineTotal = document.createElement('div');
+    lineTotal.className = 'mono fw-semibold';
     lineTotal.textContent = currency.format(item.price * item.qty);
 
     row.append(info, stepper, lineTotal);
@@ -501,18 +554,21 @@ async function bindPos() {
     subtotalEl.textContent = currency.format(subtotal);
     taxEl.textContent = currency.format(tax);
     totalEl.textContent = currency.format(subtotal + tax);
-    controlledEl?.classList.toggle("d-none", !cart.some((item) => item.controlled && item.qty > 0));
+    controlledEl?.classList.toggle(
+      'd-none',
+      !cart.some((item) => item.controlled && item.qty > 0)
+    );
     if (payButton) {
       payButton.disabled = cart.length === 0;
     }
   };
 
   const render = () => {
-    list.innerHTML = "";
+    list.innerHTML = '';
     if (!cart.length) {
-      const empty = document.createElement("div");
-      empty.className = "muted-note m-4";
-      empty.textContent = "Cart is empty. Add a product to start a sale.";
+      const empty = document.createElement('div');
+      empty.className = 'muted-note m-4';
+      empty.textContent = 'Cart is empty. Add a product to start a sale.';
       list.appendChild(empty);
     } else {
       cart.forEach((item, index) => list.appendChild(buildRow(item, index)));
@@ -524,7 +580,7 @@ async function bindPos() {
     const item = cart[index];
     const next = item.qty + delta;
     if (next > stockFor(item.id)) {
-      toast(`Only ${stockFor(item.id)} of ${item.name} in stock.`, "error");
+      toast(`Only ${stockFor(item.id)} of ${item.name} in stock.`, 'error');
       return;
     }
     item.qty = next;
@@ -540,20 +596,20 @@ async function bindPos() {
       return;
     }
     if (product.on_hand <= 0) {
-      toast(`${product.name} is out of stock.`, "error");
+      toast(`${product.name} is out of stock.`, 'error');
       return;
     }
     const existing = cart.find((item) => item.id === id);
     if (existing) {
       if (existing.qty >= product.on_hand) {
-        toast(`Only ${product.on_hand} of ${product.name} in stock.`, "error");
+        toast(`Only ${product.on_hand} of ${product.name} in stock.`, 'error');
         return;
       }
       existing.qty += 1;
     } else {
       cart.push({
         id,
-        name: `${product.name} ${product.strength || ""}`.trim(),
+        name: `${product.name} ${product.strength || ''}`.trim(),
         price: product.price,
         controlled: product.controlled,
         qty: 1,
@@ -562,8 +618,8 @@ async function bindPos() {
     render();
   }
 
-  scanInput?.addEventListener("keydown", (e) => {
-    if (e.key !== "Enter") {
+  scanInput?.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter') {
       return;
     }
     e.preventDefault();
@@ -572,39 +628,45 @@ async function bindPos() {
       return;
     }
     const match = products.find(
-      (p) => p.sku.toLowerCase() === term || p.name.toLowerCase().includes(term),
+      (p) => p.sku.toLowerCase() === term || p.name.toLowerCase().includes(term)
     );
     if (match) {
       addToCart(match.id);
-      scanInput.value = "";
+      scanInput.value = '';
     } else {
-      toast("No product matches that search.", "error");
+      toast('No product matches that search.', 'error');
     }
   });
 
-  clearButton?.addEventListener("click", () => {
+  clearButton?.addEventListener('click', () => {
     cart.length = 0;
     render();
   });
 
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "F2") {
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'F2') {
       e.preventDefault();
       scanInput?.focus();
     }
   });
 
-  payButton?.addEventListener("click", async () => {
+  payButton?.addEventListener('click', async () => {
     if (!cart.length) {
       return;
     }
     payButton.disabled = true;
     try {
       const sale = await api.createSale({
-        payment_method: methodSelect?.value || "card",
-        items: cart.map((item) => ({ medication_id: item.id, quantity: item.qty })),
+        payment_method: methodSelect?.value || 'card',
+        items: cart.map((item) => ({
+          medication_id: item.id,
+          quantity: item.qty,
+        })),
       });
-      toast(`Sale ${sale.code} completed — ${currency.format(sale.total)}.`, "success");
+      toast(
+        `Sale ${sale.code} completed — ${currency.format(sale.total)}.`,
+        'success'
+      );
       cart.length = 0;
       products = await api.medications();
       renderProducts();
@@ -620,7 +682,7 @@ async function bindPos() {
     renderProducts();
     render();
   } catch (error) {
-    grid.innerHTML = placeholder(reportError(error), "error");
+    grid.innerHTML = placeholder(reportError(error), 'error');
   }
 }
 
@@ -629,17 +691,21 @@ async function bindPos() {
 // ---------------------------------------------------------------------------
 
 const RX_COLUMNS = [
-  { state: "new", label: "New" },
-  { state: "verifying", label: "Verifying" },
-  { state: "ready", label: "Ready for pickup" },
-  { state: "dispensed", label: "Dispensed" },
+  { state: 'new', label: 'New' },
+  { state: 'verifying', label: 'Verifying' },
+  { state: 'ready', label: 'Ready for pickup' },
+  { state: 'dispensed', label: 'Dispensed' },
 ];
-const RX_ADVANCE = { new: "verifying", verifying: "ready", ready: "dispensed" };
-const RX_ADVANCE_LABEL = { new: "Start verify", verifying: "Mark ready", ready: "Dispense" };
+const RX_ADVANCE = { new: 'verifying', verifying: 'ready', ready: 'dispensed' };
+const RX_ADVANCE_LABEL = {
+  new: 'Start verify',
+  verifying: 'Mark ready',
+  ready: 'Dispense',
+};
 
 async function bindPrescriptions() {
-  const board = document.querySelector("[data-rx-board]");
-  const addButton = document.querySelector("[data-add-rx]");
+  const board = document.querySelector('[data-rx-board]');
+  const addButton = document.querySelector('[data-add-rx]');
   if (!board) {
     return;
   }
@@ -647,7 +713,7 @@ async function bindPrescriptions() {
   const transition = async (id, state) => {
     try {
       await api.transitionPrescription(id, state);
-      toast(`Prescription moved to ${state}.`, "success");
+      toast(`Prescription moved to ${state}.`, 'success');
       await load();
     } catch (error) {
       reportError(error);
@@ -657,102 +723,121 @@ async function bindPrescriptions() {
   const card = (rx) => {
     const flagBadge = rx.flag
       ? statusBadge(
-          rx.flag === "controlled" ? "controlled" : "out",
-          rx.flag[0].toUpperCase() + rx.flag.slice(1),
+          rx.flag === 'controlled' ? 'controlled' : 'out',
+          rx.flag[0].toUpperCase() + rx.flag.slice(1)
         )
-      : "";
+      : '';
     const next = RX_ADVANCE[rx.state];
     const advanceBtn = next
-      ? `<button class="btn btn-success btn-sm px-3 mt-3" type="button" data-advance="${rx.id}" data-next="${next}">${RX_ADVANCE_LABEL[rx.state]}</button>`
-      : "";
+      ? `<button class="btn btn-success btn-sm px-3 mt-3" type="button" data-advance="${escapeHtmlAttr(rx.id)}" data-next="${escapeHtmlAttr(next)}">${escapeHtml(RX_ADVANCE_LABEL[rx.state])}</button>`
+      : '';
     const voidBtn =
-      rx.state !== "dispensed" && rx.state !== "voided"
-        ? `<button class="btn btn-link btn-sm text-danger text-decoration-none px-0 mt-2" type="button" data-void="${rx.id}">Void</button>`
-        : "";
+      rx.state !== 'dispensed' && rx.state !== 'voided'
+        ? `<button class="btn btn-link btn-sm text-danger text-decoration-none px-0 mt-2" type="button" data-void="${escapeHtmlAttr(rx.id)}">Void</button>`
+        : '';
     return `
       <article class="queue-card p-3">
-        <div class="d-flex justify-content-between gap-2 mb-2"><span class="queue-card-id">${rx.code}</span><span class="queue-card-id">${timeAgo(rx.created_at)}</span></div>
-        <div class="queue-card-title">${rx.patient.name}</div>
-        <div class="queue-card-meta mt-1">${rx.medication.name} ${rx.medication.strength || ""} · <span class="mono">${rx.quantity} ${rx.unit || ""}</span></div>
-        <div class="queue-card-footer mt-3"><span class="small text-body-secondary">${rx.prescriber}</span>${flagBadge}</div>
+        <div class="d-flex justify-content-between gap-2 mb-2"><span class="queue-card-id">${escapeHtml(rx.code)}</span><span class="queue-card-id">${escapeHtml(timeAgo(rx.created_at))}</span></div>
+        <div class="queue-card-title">${escapeHtml(rx.patient.name)}</div>
+        <div class="queue-card-meta mt-1">${escapeHtml(rx.medication.name)} ${escapeHtml(rx.medication.strength || '')} · <span class="mono">${escapeHtml(rx.quantity)} ${escapeHtml(rx.unit || '')}</span></div>
+        <div class="queue-card-footer mt-3"><span class="small text-body-secondary">${escapeHtml(rx.prescriber)}</span>${flagBadge}</div>
         <div class="d-flex flex-column align-items-start">${advanceBtn}${voidBtn}</div>
       </article>`;
   };
 
   const load = async () => {
-    board.innerHTML = placeholder("Loading prescriptions…");
+    board.innerHTML = placeholder('Loading prescriptions…');
     let scripts;
     try {
       scripts = await api.prescriptions();
     } catch (error) {
-      board.innerHTML = placeholder(reportError(error), "error");
+      board.innerHTML = placeholder(reportError(error), 'error');
       return;
     }
 
     board.innerHTML = RX_COLUMNS.map((col) => {
       const cards = scripts.filter((rx) => rx.state === col.state);
       const note =
-        col.state === "dispensed"
-          ? '<div class="muted-note">Controlled prescriptions stay visible after dispensing for audit review.</div>'
-          : "";
+        col.state === 'dispensed'
+          ? `<div class="muted-note">Controlled prescriptions stay visible after dispensing for audit review.</div>`
+          : '';
       return `
         <div class="col-12 col-xl-3">
           <div class="queue-column">
-            <div class="queue-column-head"><h2 class="section-title mb-0">${col.label}</h2><span class="queue-column-count">${cards.length}</span></div>
-            ${cards.map(card).join("") || placeholder("Empty.")}
+            <div class="queue-column-head"><h2 class="section-title mb-0">${escapeHtml(col.label)}</h2><span class="queue-column-count">${cards.length}</span></div>
+            ${cards.map(card).join('') || placeholder('Empty.')}
             ${note}
           </div>
         </div>`;
-    }).join("");
+    }).join('');
 
     board
-      .querySelectorAll("[data-advance]")
+      .querySelectorAll('[data-advance]')
       .forEach((btn) =>
-        btn.addEventListener("click", () =>
-          transition(Number(btn.dataset.advance), btn.dataset.next),
-        ),
+        btn.addEventListener('click', () =>
+          transition(Number(btn.dataset.advance), btn.dataset.next)
+        )
       );
     board
-      .querySelectorAll("[data-void]")
+      .querySelectorAll('[data-void]')
       .forEach((btn) =>
-        btn.addEventListener("click", () => transition(Number(btn.dataset.void), "voided")),
+        btn.addEventListener('click', () =>
+          transition(Number(btn.dataset.void), 'voided')
+        )
       );
     refreshIcons();
   };
 
-  addButton?.addEventListener("click", async () => {
+  addButton?.addEventListener('click', async () => {
     let patients;
     let medications;
     try {
-      [patients, medications] = await Promise.all([api.patients(), api.medications()]);
+      [patients, medications] = await Promise.all([
+        api.patients(),
+        api.medications(),
+      ]);
     } catch (error) {
       reportError(error);
       return;
     }
     const values = await openForm({
-      title: "New prescription",
-      submitLabel: "Create",
+      title: 'New prescription',
+      submitLabel: 'Create',
       fields: [
         {
-          name: "patient_id",
-          label: "Patient",
-          type: "select",
+          name: 'patient_id',
+          label: 'Patient',
+          type: 'select',
           required: true,
-          options: patients.map((p) => ({ value: p.id, label: `${p.name} (${p.code})` })),
+          options: patients.map((p) => ({
+            value: p.id,
+            label: `${p.name} (${p.code})`,
+          })),
         },
         {
-          name: "medication_id",
-          label: "Medication",
-          type: "select",
+          name: 'medication_id',
+          label: 'Medication',
+          type: 'select',
           required: true,
           options: medications.map((m) => ({
             value: m.id,
-            label: `${m.name} ${m.strength || ""}`,
+            label: `${m.name} ${m.strength || ''}`,
           })),
         },
-        { name: "quantity", label: "Quantity", type: "number", required: true, value: 1 },
-        { name: "unit", label: "Unit", value: "tabs" },
-        { name: "prescriber", label: "Prescriber", required: true, placeholder: "Dr. …" },
+        {
+          name: 'quantity',
+          label: 'Quantity',
+          type: 'number',
+          required: true,
+          value: 1,
+        },
+        { name: 'unit', label: 'Unit', value: 'tabs' },
+        {
+          name: 'prescriber',
+          label: 'Prescriber',
+          required: true,
+          placeholder: 'Dr. …',
+        },
       ],
     });
     if (!values) {
@@ -763,10 +848,10 @@ async function bindPrescriptions() {
         patient_id: Number(values.patient_id),
         medication_id: Number(values.medication_id),
         quantity: Number(values.quantity),
-        unit: values.unit || "tabs",
+        unit: values.unit || 'tabs',
         prescriber: values.prescriber,
       });
-      toast("Prescription created.", "success");
+      toast('Prescription created.', 'success');
       await load();
     } catch (error) {
       reportError(error);
@@ -781,9 +866,9 @@ async function bindPrescriptions() {
 // ---------------------------------------------------------------------------
 
 async function bindPatients() {
-  const tbody = document.querySelector("[data-patient-body]");
-  const search = document.querySelector("[data-patient-search]");
-  const addButton = document.querySelector("[data-add-patient]");
+  const tbody = document.querySelector('[data-patient-body]');
+  const search = document.querySelector('[data-patient-search]');
+  const addButton = document.querySelector('[data-add-patient]');
   if (!tbody) {
     return;
   }
@@ -805,12 +890,12 @@ async function bindPatients() {
     if (!container) {
       return;
     }
-    container.innerHTML = "";
+    container.innerHTML = '';
     const values = (items || []).filter(Boolean);
     const chips = values.length ? values : [emptyLabel];
     chips.forEach((text) => {
-      const chip = document.createElement("span");
-      chip.className = "chip";
+      const chip = document.createElement('span');
+      chip.className = 'chip';
       chip.textContent = text;
       container.appendChild(chip);
     });
@@ -824,23 +909,25 @@ async function bindPatients() {
       const p = await api.patient(id);
       fields.name.textContent = p.name;
       fields.summary.textContent = `${p.code} · DOB ${formatDate(p.dob)}`;
-      fields.phone.textContent = p.phone || "—";
-      fields.plan.textContent = p.plan || "—";
+      fields.phone.textContent = p.phone || '—';
+      fields.plan.textContent = p.plan || '—';
       fields.active.textContent = p.active_prescriptions;
-      renderChips(fields.allergies, p.allergies, "None recorded");
+      renderChips(fields.allergies, p.allergies, 'None recorded');
       const meds = (p.prescriptions || []).map((rx) =>
-        `${rx.medication_name} ${rx.medication_strength || ""}`.trim(),
+        `${rx.medication_name} ${rx.medication_strength || ''}`.trim()
       );
-      renderChips(fields.medications, meds, "No medications");
+      renderChips(fields.medications, meds, 'No medications');
     } catch (error) {
       reportError(error);
     }
   };
 
   const render = () => {
-    const term = (search?.value || "").trim().toLowerCase();
+    const term = (search?.value || '').trim().toLowerCase();
     const visible = patients.filter(
-      (p) => !term || `${p.name} ${p.code} ${p.plan || ""}`.toLowerCase().includes(term),
+      (p) =>
+        !term ||
+        `${p.name} ${p.code} ${p.plan || ''}`.toLowerCase().includes(term)
     );
     if (!visible.some((p) => p.id === selectedId)) {
       selectedId = visible.length ? visible[0].id : null;
@@ -849,31 +936,31 @@ async function bindPatients() {
     tbody.innerHTML = visible.length
       ? visible
           .map((p) => {
-            const active = p.id === selectedId ? "table-active" : "";
+            const active = p.id === selectedId ? 'table-active' : '';
             return `
-              <tr data-patient-row data-id="${p.id}" class="${active}" role="button" tabindex="0">
-                <td><div class="fw-semibold">${p.name}</div></td>
-                <td class="mono text-body-secondary">${p.code}</td>
-                <td class="mono text-body-secondary">${formatDate(p.dob)}</td>
-                <td>${p.plan || "—"}</td>
-                <td class="text-end mono">${p.active ?? "—"}</td>
-                <td class="mono text-body-secondary">${formatDate(p.last_visit)}</td>
+              <tr data-patient-row data-id="${escapeHtmlAttr(p.id)}" class="${active}" role="button" tabindex="0">
+                <td><div class="fw-semibold">${escapeHtml(p.name)}</div></td>
+                <td class="mono text-body-secondary">${escapeHtml(p.code)}</td>
+                <td class="mono text-body-secondary">${escapeHtml(formatDate(p.dob))}</td>
+                <td>${escapeHtml(p.plan || '—')}</td>
+                <td class="text-end mono">${escapeHtml(p.active ?? '—')}</td>
+                <td class="mono text-body-secondary">${escapeHtml(formatDate(p.last_visit))}</td>
               </tr>`;
           })
-          .join("")
-      : `<tr><td colspan="6">${placeholder("No patients match your search.")}</td></tr>`;
+          .join('')
+      : `<tr><td colspan="6">${placeholder('No patients match your search.')}</td></tr>`;
 
-    tbody.querySelectorAll("[data-patient-row]").forEach((row) => {
+    tbody.querySelectorAll('[data-patient-row]').forEach((row) => {
       const select = () => {
         selectedId = Number(row.dataset.id);
         tbody
-          .querySelectorAll("[data-patient-row]")
-          .forEach((r) => r.classList.toggle("table-active", r === row));
+          .querySelectorAll('[data-patient-row]')
+          .forEach((r) => r.classList.toggle('table-active', r === row));
         renderDetail(selectedId);
       };
-      row.addEventListener("click", select);
-      row.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
+      row.addEventListener('click', select);
+      row.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           select();
         }
@@ -884,30 +971,30 @@ async function bindPatients() {
   };
 
   const load = async () => {
-    tbody.innerHTML = `<tr><td colspan="6">${placeholder("Loading patients…")}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6">${placeholder('Loading patients…')}</td></tr>`;
     try {
       patients = await api.patients();
       render();
     } catch (error) {
-      tbody.innerHTML = `<tr><td colspan="6">${placeholder(reportError(error), "error")}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6">${placeholder(reportError(error), 'error')}</td></tr>`;
     }
   };
 
-  search?.addEventListener("input", render);
+  search?.addEventListener('input', render);
 
-  addButton?.addEventListener("click", async () => {
+  addButton?.addEventListener('click', async () => {
     const values = await openForm({
-      title: "Add patient",
-      submitLabel: "Create",
+      title: 'Add patient',
+      submitLabel: 'Create',
       fields: [
-        { name: "name", label: "Full name", required: true },
-        { name: "dob", label: "Date of birth", type: "date" },
-        { name: "phone", label: "Phone" },
-        { name: "plan", label: "Insurance plan" },
+        { name: 'name', label: 'Full name', required: true },
+        { name: 'dob', label: 'Date of birth', type: 'date' },
+        { name: 'phone', label: 'Phone' },
+        { name: 'plan', label: 'Insurance plan' },
         {
-          name: "allergies",
-          label: "Allergies (comma separated)",
-          placeholder: "Penicillin, Aspirin",
+          name: 'allergies',
+          label: 'Allergies (comma separated)',
+          placeholder: 'Penicillin, Aspirin',
         },
       ],
     });
@@ -922,12 +1009,12 @@ async function bindPatients() {
         plan: values.plan || null,
         allergies: values.allergies
           ? values.allergies
-              .split(",")
+              .split(',')
               .map((a) => a.trim())
               .filter(Boolean)
           : [],
       });
-      toast(`${values.name} added.`, "success");
+      toast(`${values.name} added.`, 'success');
       await load();
     } catch (error) {
       reportError(error);
@@ -941,24 +1028,28 @@ async function bindPatients() {
 // Orders (purchase orders)
 // ---------------------------------------------------------------------------
 
-const PO_ADVANCE = { draft: "submitted", submitted: "transit", transit: "received" };
+const PO_ADVANCE = {
+  draft: 'submitted',
+  submitted: 'transit',
+  transit: 'received',
+};
 const PO_ADVANCE_LABEL = {
-  draft: "Submit",
-  submitted: "Mark in transit",
-  transit: "Receive stock",
+  draft: 'Submit',
+  submitted: 'Mark in transit',
+  transit: 'Receive stock',
 };
 const PO_STATE_LABEL = {
-  draft: "Draft",
-  submitted: "Submitted",
-  transit: "In transit",
-  received: "Received",
-  cancelled: "Cancelled",
+  draft: 'Draft',
+  submitted: 'Submitted',
+  transit: 'In transit',
+  received: 'Received',
+  cancelled: 'Cancelled',
 };
 
 async function bindOrders() {
-  const tbody = document.querySelector("[data-order-body]");
-  const banner = document.querySelector("[data-reorder-banner]");
-  const addButton = document.querySelector("[data-add-order]");
+  const tbody = document.querySelector('[data-order-body]');
+  const banner = document.querySelector('[data-reorder-banner]');
+  const addButton = document.querySelector('[data-add-order]');
   if (!tbody) {
     return;
   }
@@ -981,10 +1072,10 @@ async function bindOrders() {
     try {
       await api.transitionPurchaseOrder(id, state);
       toast(
-        state === "received"
-          ? "Stock received and added to inventory."
+        state === 'received'
+          ? 'Stock received and added to inventory.'
           : `Order moved to ${state}.`,
-        "success",
+        'success'
       );
       await load();
     } catch (error) {
@@ -1011,31 +1102,34 @@ async function bindOrders() {
           .map(
             (item) => `
             <div class="detail-row">
-              <span class="detail-row-label">${item.medication_name}</span>
-              <span class="detail-row-value mono">${item.units} × ${currency.format(item.unit_cost)}</span>
-            </div>`,
+              <span class="detail-row-label">${escapeHtml(item.medication_name)}</span>
+              <span class="detail-row-value mono">${escapeHtml(item.units)} × ${escapeHtml(currency.format(item.unit_cost))}</span>
+            </div>`
           )
-          .join("") || placeholder("No line items.");
+          .join('') || placeholder('No line items.');
 
       if (fields.actions) {
         const next = PO_ADVANCE[po.state];
         const advanceBtn = next
-          ? `<button class="btn btn-success btn-sm px-3" type="button" data-order-advance data-id="${po.id}" data-next="${next}">${PO_ADVANCE_LABEL[po.state]}</button>`
-          : "";
+          ? `<button class="btn btn-success btn-sm px-3" type="button" data-order-advance data-id="${escapeHtmlAttr(po.id)}" data-next="${escapeHtmlAttr(next)}">${escapeHtml(PO_ADVANCE_LABEL[po.state])}</button>`
+          : '';
         const cancelBtn =
-          po.state !== "received" && po.state !== "cancelled"
-            ? `<button class="btn btn-outline-secondary btn-sm px-3" type="button" data-order-cancel data-id="${po.id}">Cancel</button>`
-            : "";
+          po.state !== 'received' && po.state !== 'cancelled'
+            ? `<button class="btn btn-outline-secondary btn-sm px-3" type="button" data-order-cancel data-id="${escapeHtmlAttr(po.id)}">Cancel</button>`
+            : '';
         fields.actions.innerHTML =
-          advanceBtn + cancelBtn || '<span class="muted-note">No actions available.</span>';
-        fields.actions.querySelector("[data-order-advance]")?.addEventListener("click", (e) => {
-          const t = e.currentTarget;
-          transition(Number(t.dataset.id), t.dataset.next);
-        });
+          advanceBtn + cancelBtn ||
+          `<span class="muted-note">No actions available.</span>`;
         fields.actions
-          .querySelector("[data-order-cancel]")
-          ?.addEventListener("click", (e) =>
-            transition(Number(e.currentTarget.dataset.id), "cancelled"),
+          .querySelector('[data-order-advance]')
+          ?.addEventListener('click', (e) => {
+            const t = e.currentTarget;
+            transition(Number(t.dataset.id), t.dataset.next);
+          });
+        fields.actions
+          .querySelector('[data-order-cancel]')
+          ?.addEventListener('click', (e) =>
+            transition(Number(e.currentTarget.dataset.id), 'cancelled')
           );
       }
     } catch (error) {
@@ -1051,32 +1145,32 @@ async function bindOrders() {
     tbody.innerHTML = orders.length
       ? orders
           .map((o) => {
-            const active = o.id === selectedId ? "table-active" : "";
+            const active = o.id === selectedId ? 'table-active' : '';
             return `
-              <tr data-order-row data-id="${o.id}" class="${active}" role="button" tabindex="0">
-                <td class="mono fw-semibold">${o.code}</td>
-                <td>${o.supplier.name}</td>
-                <td class="text-end mono">${o.item_count}</td>
-                <td class="text-end mono">${o.total_units}</td>
-                <td class="mono text-body-secondary">${formatDate(o.expected_at)}</td>
+              <tr data-order-row data-id="${escapeHtmlAttr(o.id)}" class="${active}" role="button" tabindex="0">
+                <td class="mono fw-semibold">${escapeHtml(o.code)}</td>
+                <td>${escapeHtml(o.supplier.name)}</td>
+                <td class="text-end mono">${escapeHtml(o.item_count)}</td>
+                <td class="text-end mono">${escapeHtml(o.total_units)}</td>
+                <td class="mono text-body-secondary">${escapeHtml(formatDate(o.expected_at))}</td>
                 <td>${statusBadge(o.state, PO_STATE_LABEL[o.state] || o.state)}</td>
-                <td class="text-end mono">${currency.format(o.total_cost)}</td>
+                <td class="text-end mono">${escapeHtml(currency.format(o.total_cost))}</td>
               </tr>`;
           })
-          .join("")
-      : `<tr><td colspan="7">${placeholder("No purchase orders yet.")}</td></tr>`;
+          .join('')
+      : `<tr><td colspan="7">${placeholder('No purchase orders yet.')}</td></tr>`;
 
-    tbody.querySelectorAll("[data-order-row]").forEach((row) => {
+    tbody.querySelectorAll('[data-order-row]').forEach((row) => {
       const select = () => {
         selectedId = Number(row.dataset.id);
         tbody
-          .querySelectorAll("[data-order-row]")
-          .forEach((r) => r.classList.toggle("table-active", r === row));
+          .querySelectorAll('[data-order-row]')
+          .forEach((r) => r.classList.toggle('table-active', r === row));
         renderDetail(selectedId);
       };
-      row.addEventListener("click", select);
-      row.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
+      row.addEventListener('click', select);
+      row.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           select();
         }
@@ -1094,69 +1188,81 @@ async function bindOrders() {
       const summary = await api.dashboard();
       const names = (summary.low_stock || []).map((m) => m.name);
       banner.innerHTML = names.length
-        ? `<strong>${names.length} item${names.length === 1 ? " is" : "s are"} at or below the reorder point.</strong><p class="mono">${names.join(" · ")}</p>`
-        : "<strong>All stock is above the reorder point.</strong>";
+        ? `<strong>${names.length} item${names.length === 1 ? ' is' : 's are'} at or below the reorder point.</strong><p class="mono">${escapeHtml(names.join(' · '))}</p>`
+        : `<strong>All stock is above the reorder point.</strong>`;
     } catch {
       // banner is non-critical
     }
   };
 
   const load = async () => {
-    tbody.innerHTML = `<tr><td colspan="7">${placeholder("Loading orders…")}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7">${placeholder('Loading orders…')}</td></tr>`;
     try {
       orders = await api.purchaseOrders();
       render();
     } catch (error) {
-      tbody.innerHTML = `<tr><td colspan="7">${placeholder(reportError(error), "error")}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7">${placeholder(reportError(error), 'error')}</td></tr>`;
     }
     await loadBanner();
   };
 
-  addButton?.addEventListener("click", async () => {
+  addButton?.addEventListener('click', async () => {
     let suppliers;
     let medications;
     try {
-      [suppliers, medications] = await Promise.all([api.suppliers(), api.medications()]);
+      [suppliers, medications] = await Promise.all([
+        api.suppliers(),
+        api.medications(),
+      ]);
     } catch (error) {
       reportError(error);
       return;
     }
     const values = await openForm({
-      title: "Create purchase order",
-      submitLabel: "Create",
+      title: 'Create purchase order',
+      submitLabel: 'Create',
       fields: [
         {
-          name: "supplier_id",
-          label: "Supplier",
-          type: "select",
+          name: 'supplier_id',
+          label: 'Supplier',
+          type: 'select',
           required: true,
           options: suppliers.map((s) => ({ value: s.id, label: s.name })),
         },
-        { name: "expected_at", label: "Expected date", type: "date" },
+        { name: 'expected_at', label: 'Expected date', type: 'date' },
         {
-          name: "medication_id",
-          label: "Medication",
-          type: "select",
+          name: 'medication_id',
+          label: 'Medication',
+          type: 'select',
           required: true,
           options: medications.map((m) => ({
             value: m.id,
-            label: `${m.name} ${m.strength || ""}`,
+            label: `${m.name} ${m.strength || ''}`,
           })),
         },
-        { name: "units", label: "Units", type: "number", required: true, value: 1 },
         {
-          name: "unit_cost",
-          label: "Unit cost",
-          type: "number",
-          step: "0.01",
-          placeholder: "optional",
+          name: 'units',
+          label: 'Units',
+          type: 'number',
+          required: true,
+          value: 1,
+        },
+        {
+          name: 'unit_cost',
+          label: 'Unit cost',
+          type: 'number',
+          step: '0.01',
+          placeholder: 'optional',
         },
       ],
     });
     if (!values) {
       return;
     }
-    const item = { medication_id: Number(values.medication_id), units: Number(values.units) };
+    const item = {
+      medication_id: Number(values.medication_id),
+      units: Number(values.units),
+    };
     if (values.unit_cost) {
       item.unit_cost = Number(values.unit_cost);
     }
@@ -1166,7 +1272,7 @@ async function bindOrders() {
         expected_at: values.expected_at || null,
         items: [item],
       });
-      toast("Purchase order created.", "success");
+      toast('Purchase order created.', 'success');
       await load();
     } catch (error) {
       reportError(error);

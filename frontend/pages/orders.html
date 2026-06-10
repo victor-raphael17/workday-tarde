@@ -4,7 +4,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>CA Pharmacy | Orders</title>
-    <meta name="description" content="Supplier orders frontend for CA Pharmacy." />
+    <meta
+      name="description"
+      content="Supplier orders frontend for CA Pharmacy."
+    />
     <link rel="icon" href="../assets/images/logo-mark.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -20,7 +23,10 @@
     />
     <link rel="stylesheet" href="../assets/css/theme.css" />
     <link rel="stylesheet" href="../assets/css/app.css" />
-    <script src="https://unpkg.com/lucide@1.17.0/dist/umd/lucide.min.js" defer></script>
+    <script
+      src="https://unpkg.com/lucide@1.17.0/dist/umd/lucide.min.js"
+      defer
+    ></script>
   </head>
   <body data-page="orders">
     <div class="app-scrim d-lg-none" id="appScrim"></div>
@@ -40,10 +46,17 @@
               </p>
             </div>
             <div class="d-flex flex-wrap gap-2">
-              <button class="btn btn-outline-secondary btn-sm px-3" type="button">
+              <button
+                class="btn btn-outline-secondary btn-sm px-3"
+                type="button"
+              >
                 Receive stock
               </button>
-              <button class="btn btn-success btn-sm px-3" type="button" data-add-order>
+              <button
+                class="btn btn-success btn-sm px-3"
+                type="button"
+                data-add-order
+              >
                 Create order
               </button>
             </div>
@@ -54,7 +67,11 @@
             <div class="flex-grow-1" data-reorder-banner>
               <strong>Checking stock levels…</strong>
             </div>
-            <button class="btn btn-success btn-sm px-3" type="button" data-add-order>
+            <button
+              class="btn btn-success btn-sm px-3"
+              type="button"
+              data-add-order
+            >
               Create reorder
             </button>
           </section>
@@ -82,37 +99,54 @@
             </div>
 
             <div class="col-12 col-xl-4">
-              <article class="card border-0 shadow-sm detail-card selected-panel">
+              <article
+                class="card border-0 shadow-sm detail-card selected-panel"
+              >
                 <div class="card-body p-4 d-flex flex-column gap-4">
-                  <div class="d-flex align-items-start justify-content-between gap-3">
+                  <div
+                    class="d-flex align-items-start justify-content-between gap-3"
+                  >
                     <div>
                       <div class="page-kicker mb-2">Selected order</div>
-                      <div class="detail-title mono" data-order="id">PO-2061</div>
+                      <div class="detail-title mono" data-order="id">
+                        PO-2061
+                      </div>
                       <div class="detail-subtitle" data-order="supplier">
                         MedSource Distribution
                       </div>
                     </div>
-                    <span class="status-badge status-warning" data-order="badge">In transit</span>
+                    <span class="status-badge status-warning" data-order="badge"
+                      >In transit</span
+                    >
                   </div>
                   <div class="detail-list">
                     <div class="detail-row">
                       <span class="detail-row-label">Expected</span
-                      ><span class="detail-row-value mono" data-order="expected">07 Jun 2026</span>
+                      ><span class="detail-row-value mono" data-order="expected"
+                        >07 Jun 2026</span
+                      >
                     </div>
                     <div class="detail-row">
                       <span class="detail-row-label">Units</span
-                      ><span class="detail-row-value mono" data-order="units">320</span>
+                      ><span class="detail-row-value mono" data-order="units"
+                        >320</span
+                      >
                     </div>
                     <div class="detail-row">
                       <span class="detail-row-label">Total</span
-                      ><span class="detail-row-value mono" data-order="total">$4,180.50</span>
+                      ><span class="detail-row-value mono" data-order="total"
+                        >$4,180.50</span
+                      >
                     </div>
                   </div>
                   <div>
                     <div class="page-kicker mb-2">Line items preview</div>
                     <div class="detail-list" data-order="lines"></div>
                   </div>
-                  <div class="d-flex flex-wrap gap-2" data-order="actions"></div>
+                  <div
+                    class="d-flex flex-wrap gap-2"
+                    data-order="actions"
+                  ></div>
                 </div>
               </article>
             </div>

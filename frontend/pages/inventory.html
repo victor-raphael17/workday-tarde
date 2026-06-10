@@ -4,7 +4,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>CA Pharmacy | Inventory</title>
-    <meta name="description" content="Inventory management frontend for CA Pharmacy." />
+    <meta
+      name="description"
+      content="Inventory management frontend for CA Pharmacy."
+    />
     <link rel="icon" href="../assets/images/logo-mark.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -20,7 +23,10 @@
     />
     <link rel="stylesheet" href="../assets/css/theme.css" />
     <link rel="stylesheet" href="../assets/css/app.css" />
-    <script src="https://unpkg.com/lucide@1.17.0/dist/umd/lucide.min.js" defer></script>
+    <script
+      src="https://unpkg.com/lucide@1.17.0/dist/umd/lucide.min.js"
+      defer
+    ></script>
   </head>
   <body data-page="inventory">
     <div class="app-scrim d-lg-none" id="appScrim"></div>
@@ -40,11 +46,23 @@
               </p>
             </div>
             <div class="d-flex flex-wrap gap-2">
-              <button class="btn btn-outline-secondary btn-sm px-3" type="button">Export</button>
-              <button class="btn btn-outline-secondary btn-sm px-3" type="button">
+              <button
+                class="btn btn-outline-secondary btn-sm px-3"
+                type="button"
+              >
+                Export
+              </button>
+              <button
+                class="btn btn-outline-secondary btn-sm px-3"
+                type="button"
+              >
                 Receive stock
               </button>
-              <button class="btn btn-success btn-sm px-3" type="button" data-add-medication>
+              <button
+                class="btn btn-success btn-sm px-3"
+                type="button"
+                data-add-medication
+              >
                 Add medication
               </button>
             </div>
@@ -52,24 +70,46 @@
 
           <section class="row g-4">
             <div class="col-12 col-xl-8">
-              <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 mb-3">
+              <div
+                class="d-flex flex-column flex-lg-row justify-content-between gap-3 mb-3"
+              >
                 <div class="filter-toolbar">
-                  <button class="filter-chip active" type="button" data-stock-filter="all">
+                  <button
+                    class="filter-chip active"
+                    type="button"
+                    data-stock-filter="all"
+                  >
                     All items <span class="mono">12</span>
                   </button>
-                  <button class="filter-chip" type="button" data-stock-filter="low">
+                  <button
+                    class="filter-chip"
+                    type="button"
+                    data-stock-filter="low"
+                  >
                     Low / out <span class="mono">4</span>
                   </button>
-                  <button class="filter-chip" type="button" data-stock-filter="expiring">
+                  <button
+                    class="filter-chip"
+                    type="button"
+                    data-stock-filter="expiring"
+                  >
                     Expiring <span class="mono">1</span>
                   </button>
-                  <button class="filter-chip" type="button" data-stock-filter="controlled">
+                  <button
+                    class="filter-chip"
+                    type="button"
+                    data-stock-filter="controlled"
+                  >
                     Controlled <span class="mono">2</span>
                   </button>
                 </div>
                 <label class="inventory-search mb-0">
                   <i data-lucide="search"></i>
-                  <input type="search" placeholder="Search name or SKU..." data-inventory-search />
+                  <input
+                    type="search"
+                    placeholder="Search name or SKU..."
+                    data-inventory-search
+                  />
                 </label>
               </div>
 
@@ -94,40 +134,62 @@
             </div>
 
             <div class="col-12 col-xl-4">
-              <article class="card border-0 shadow-sm detail-card selected-panel">
+              <article
+                class="card border-0 shadow-sm detail-card selected-panel"
+              >
                 <div class="card-body p-4 d-flex flex-column gap-4">
-                  <div class="d-flex align-items-start justify-content-between gap-3">
+                  <div
+                    class="d-flex align-items-start justify-content-between gap-3"
+                  >
                     <div>
                       <div class="page-kicker mb-2">Selected medication</div>
-                      <div class="detail-title" data-detail="name">Amoxicillin</div>
+                      <div class="detail-title" data-detail="name">
+                        Amoxicillin
+                      </div>
                       <div class="detail-subtitle" data-detail="subtitle">
                         500 mg · Capsule · Antibiotics
                       </div>
                     </div>
-                    <span class="status-badge status-success" data-detail="badge">In stock</span>
+                    <span
+                      class="status-badge status-success"
+                      data-detail="badge"
+                      >In stock</span
+                    >
                   </div>
                   <div class="detail-list">
                     <div class="detail-row">
                       <span class="detail-row-label">On hand</span
-                      ><span class="detail-row-value mono" data-detail="onHand">24 packs</span>
+                      ><span class="detail-row-value mono" data-detail="onHand"
+                        >24 packs</span
+                      >
                     </div>
                     <div class="detail-row">
                       <span class="detail-row-label">Reorder point</span
-                      ><span class="detail-row-value mono" data-detail="reorder">10 packs</span>
+                      ><span class="detail-row-value mono" data-detail="reorder"
+                        >10 packs</span
+                      >
                     </div>
                     <div class="detail-row">
                       <span class="detail-row-label">Expiry</span
-                      ><span class="detail-row-value mono" data-detail="expiry">12 Aug 2026</span>
+                      ><span class="detail-row-value mono" data-detail="expiry"
+                        >12 Aug 2026</span
+                      >
                     </div>
                     <div class="detail-row">
                       <span class="detail-row-label">Unit price</span
-                      ><span class="detail-row-value mono" data-detail="price">$12.40</span>
+                      ><span class="detail-row-value mono" data-detail="price"
+                        >$12.40</span
+                      >
                     </div>
                   </div>
                   <div>
                     <div class="page-kicker mb-2">Suggested actions</div>
                     <div class="chip-row">
-                      <button type="button" class="chip chip-action" data-detail-action="receive">
+                      <button
+                        type="button"
+                        class="chip chip-action"
+                        data-detail-action="receive"
+                      >
                         Adjust stock
                       </button>
                     </div>
