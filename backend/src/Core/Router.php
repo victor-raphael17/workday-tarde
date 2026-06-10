@@ -8,22 +8,68 @@ use App\Core\Exceptions\HttpException;
 use App\Core\Exceptions\NotFoundException;
 
 /**
- * Minimal regex-based router.
- *
- * Routes are registered as (method, path, [ControllerClass, action]). Path
- * segments wrapped in braces — e.g. /medications/{id} — become named route
- * parameters captured into the Request.
+ * Minimal regex-based router with middleware chain support.
  */
 final class Router
 {
-    /** @var array<int, array{method: string, regex: string, params: string[], handler: array{0: class-string, 1: string}}> */
+    /** @var array<int, array{method: string, regex: string, params: string[], handler: array{0: class-string, 1: string}, middleware: array<int, class-string>}> */
     private array $routes = [];
 
     /**
      * @param array{0: class-string, 1: string} $handler
+     * @param array<int, class-string>          $middleware
      */
-    public function add(string $method, string $path, array $handler): void
+    public function get(string $path, array $handler, array $middleware = []): void
     {
+        $this->registerRoute('GET', $path, $handler, $middleware);
+    }
+
+    /**
+     * @param array{0: class-string, 1: string} $handler
+     * @param array<int, class-string>          $middleware
+     */
+    public function post(string $path, array $handler, array $middleware = []): void
+    {
+        $this->registerRoute('POST', $path, $handler, $middleware);
+    }
+
+    /**
+     * @param array{0: class-string, 1: string} $handler
+     * @param array<int, class-string>          $middleware
+     */
+    public function put(string $path, array $handler, array $middleware = []): void
+    {
+        $this->registerRoute('PUT', $path, $handler, $middleware);
+    }
+
+    /**
+     * @param array{0: class-string, 1: string} $handler
+     * @param array<int, class-string>          $middleware
+     */
+    public function patch(string $path, array $handler, array $middleware = []): void
+    {
+        $this->registerRoute('PATCH', $path, $handler, $middleware);
+    }
+
+    /**
+     * @param array{0: class-string, 1: string} $handler
+     * @param array<int, class-string>          $middleware
+     */
+    public function delete(string $path, array $handler, array $middleware = []): void
+    {
+        $this->registerRoute('DELETE', $path, $handler, $middleware);
+    }
+
+    /**
+     * @param array{0: class-string, 1: string} $handler
+     * @param array<int, class-string>          $middleware
+     */
+    private function registerRoute(
+        string $method,
+        string $path,
+        array $handler,
+        array $middleware = []
+    ): void {
         $params = [];
         $regex = preg_replace_callback(
             '#\{([a-zA-Z_][a-zA-Z0-9_]*)\}#',
@@ -35,67 +81,69 @@ final class Router
         );
 
         $this->routes[] = [
-            'method'  => strtoupper($method),
-            'regex'   => '#^' . $regex . '$#',
-            'params'  => $params,
-            'handler' => $handler,
+            'method'     => strtoupper($method),
+            'regex'      => '#^' . $regex . '$#',
+            'params'     => $params,
+            'handler'    => $handler,
+            'middleware' => $middleware,
         ];
-    }
-
-    public function get(string $path, array $handler): void
-    {
-        $this->add('GET', $path, $handler);
-    }
-
-    public function post(string $path, array $handler): void
-    {
-        $this->add('POST', $path, $handler);
-    }
-
-    public function put(string $path, array $handler): void
-    {
-        $this->add('PUT', $path, $handler);
-    }
-
-    public function patch(string $path, array $handler): void
-    {
-        $this->add('PATCH', $path, $handler);
-    }
-
-    public function delete(string $path, array $handler): void
-    {
-        $this->add('DELETE', $path, $handler);
     }
 
     public function dispatch(Request $request): Response
     {
+        $match = $this->match($request);
+
+        if (!$match) {
+            $path = rtrim($request->path, '/') ?: '/';
+
+            foreach ($this->routes as $route) {
+                if (preg_match($route['regex'], $path)) {
+                    throw new HttpException(405, "Method {$request->method} not allowed for {$path}.");
+                }
+            }
+
+            throw new NotFoundException("No route matches {$request->method} {$request->path}.");
+        }
+
+        foreach ($match['middleware'] as $middlewareClass) {
+            $middleware = new $middlewareClass();
+            $response = $middleware->handle($request);
+
+            if ($response) {
+                return $response;
+            }
+        }
+
+        [$controllerClass, $method] = $match['handler'];
+        $controller = new $controllerClass();
+
+        return $controller->$method($request);
+    }
+
+    /**
+     * @return array{method: string, regex: string, params: string[], handler: array{0: class-string, 1: string}, middleware: array<int, class-string>}|null
+     */
+    private function match(Request $request): ?array
+    {
         $path = rtrim($request->path, '/') ?: '/';
-        $methodMatched = false;
 
         foreach ($this->routes as $route) {
-            if (!preg_match($route['regex'], $path, $matches)) {
-                continue;
-            }
-
-            // A path match with the wrong verb => 405 rather than 404.
             if ($route['method'] !== $request->method) {
-                $methodMatched = true;
                 continue;
             }
 
-            array_shift($matches);
-            $request->params = array_combine($route['params'], array_map('rawurldecode', $matches)) ?: [];
+            if (preg_match($route['regex'], $path, $matches)) {
+                array_shift($matches);
 
-            [$class, $action] = $route['handler'];
-            $controller = new $class();
+                $request->params = array_combine(
+                    $route['params'],
+                    array_map('rawurldecode', $matches)
+                ) ?: [];
 
-            return $controller->$action($request);
+                return $route;
+            }
         }
 
-        if ($methodMatched) {
-            throw new HttpException(405, "Method {$request->method} not allowed for {$path}.");
-        }
-
-        throw new NotFoundException("No route matches {$request->method} {$path}.");
+        return null;
     }
 }

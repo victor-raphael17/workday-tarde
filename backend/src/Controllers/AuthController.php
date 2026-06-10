@@ -8,18 +8,18 @@ use App\Core\Controller;
 use App\Core\Request;
 use App\Core\Response;
 use App\Services\AuthService;
+use App\Support\RateLimit; // Importa o nosso novo suporte
+use App\Core\Exceptions\UnauthorizedException; // Importa a exceção de erro de login
 
-/**
- * Authentication endpoints: sign in, sign out, and current user.
- *
- * Sign-in returns a bearer token the client sends back as
- * `Authorization: Bearer <token>` on later requests.
- */
 final class AuthController extends Controller
 {
+    private readonly RateLimit $rateLimit;
+
     public function __construct(
         private readonly AuthService $auth = new AuthService(),
     ) {
+        // Instancia o limitador
+        $this->rateLimit = new RateLimit();
     }
 
     /** POST /api/auth/login */
@@ -30,7 +30,39 @@ final class AuthController extends Controller
             'password' => 'required|string|max:200',
         ]);
 
-        return Response::ok($this->auth->login($data['email'], $data['password']));
+        $email = $data['email'];
+
+        // 1. Verificar se o e-mail já excedeu o limite
+        if ($this->rateLimit->tooManyAttempts($email)) {
+            
+            // TAREFA: Log das tentativas bloqueadas (usando o error_log nativo ou classe de Log do projeto)
+            error_log("SECURITY WARNING: Brute-force detectado e bloqueado para o e-mail: {$email}");
+
+            $retryAfter = $this->rateLimit->remainingSeconds($email);
+
+            // TAREFA: Adicionar Response::tooManyRequests() (429 status)
+            return Response::tooManyRequests([
+                'error' => 'Muitas tentativas de login. Acesso bloqueado por 5 minutos.',
+                'retry_after' => $retryAfter
+            ], $retryAfter);
+        }
+
+        try {
+            // Tenta efetuar o login
+            $result = $this->auth->login($data['email'], $data['password']);
+
+            // Se deu certo, limpa o contador do e-mail
+            $this->rateLimit->clear($email);
+
+            return Response::ok($result);
+
+        } catch (UnauthorizedException $e) {
+            // Se errou a senha (lançou erro 401), contabiliza o erro no RateLimit
+            $this->rateLimit->hit($email);
+            
+            // Repassa a exceção para o sistema tratar o 401 normalmente
+            throw $e;
+        }
     }
 
     /** GET /api/auth/me */

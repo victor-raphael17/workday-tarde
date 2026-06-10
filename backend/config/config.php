@@ -25,6 +25,13 @@ return [
         'session_ttl' => (int) Env::get('AUTH_SESSION_TTL', (string) (12 * 60 * 60)),
     ],
 
+    'cors' => [
+        // Comma-separated browser origins allowed to call the API.
+        'allowed_origins' => array_filter(
+            array_map('trim', explode(',', Env::get('CORS_ALLOWED_ORIGINS', '') ?? ''))
+        ),
+    ],
+
     'db' => [
         'host'     => Env::get('DB_HOST', 'db'),
         'port'     => Env::get('DB_PORT', '5432'),

@@ -28,7 +28,11 @@ services:
       DB_DATABASE: ca_pharmacy
       DB_USERNAME: ca_pharmacy
       DB_PASSWORD: ca_pharmacy
+<<<<<<< HEAD
       ALLOWED_ORIGINS: http://localhost:4173, http://localhost:8080
+=======
+      CORS_ALLOWED_ORIGINS: http://localhost:4173
+>>>>>>> ade85580d76035a407d02c6b70be06a70cf7599d
     ports:
       - "8080:80"
     depends_on:

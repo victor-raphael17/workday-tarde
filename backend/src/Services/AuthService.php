@@ -17,7 +17,7 @@ use App\Repositories\UserRepository;
  * `Authorization: Bearer <token>` header; we hash it and look up the matching
  * live session. Logout deletes the session row.
  */
-final class AuthService
+final class AuthService implements AuthServiceInterface
 {
     public function __construct(
         private readonly UserRepository $users = new UserRepository(),

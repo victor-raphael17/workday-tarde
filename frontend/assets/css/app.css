@@ -135,7 +135,9 @@ body {
   text-decoration: none;
   font-size: 0.94rem;
   font-weight: 600;
-  transition: background-color 120ms ease, color 120ms ease;
+  transition:
+    background-color 120ms ease,
+    color 120ms ease;
 }
 
 .sidebar-link:hover {
@@ -173,12 +175,18 @@ body {
   color: #8c97a4;
 }
 
+.topbar-search-wrap {
+  position: relative;
+  min-width: 0;
+  width: min(100%, 420px);
+}
+
 .topbar-search {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   min-width: 0;
-  width: min(100%, 420px);
+  width: 100%;
   padding: 0.75rem 0.9rem;
   border: 1px solid var(--border);
   border-radius: 0.9rem;
@@ -210,6 +218,10 @@ body {
   gap: 0.65rem;
 }
 
+.topbar-action-wrap {
+  position: relative;
+}
+
 .topbar-branch,
 .topbar-icon,
 .topbar-menu {
@@ -235,8 +247,138 @@ body {
   height: 44px;
 }
 
+.topbar-icon[aria-expanded='true'] {
+  border-color: var(--green-600);
+  color: var(--green-700);
+  box-shadow: 0 0 0 3px var(--green-100);
+}
+
 .topbar-menu {
   display: none;
+}
+
+.topbar-panel {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  z-index: 50;
+  max-height: min(70vh, 430px);
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 0.85rem;
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+}
+
+.topbar-search-panel {
+  left: 0;
+  width: min(520px, calc(100vw - 2rem));
+}
+
+.topbar-action-panel {
+  right: 0;
+  width: min(340px, calc(100vw - 2rem));
+}
+
+.topbar-result-group {
+  padding: 0.45rem;
+}
+
+.topbar-result-group + .topbar-result-group {
+  border-top: 1px solid var(--border);
+}
+
+.topbar-result-group-title {
+  padding: 0.45rem 0.55rem 0.3rem;
+  color: var(--fg-subtle);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.topbar-result {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 0.65rem;
+  align-items: center;
+  min-width: 0;
+  padding: 0.65rem 0.6rem;
+  border-radius: 0.65rem;
+  color: var(--fg);
+  text-decoration: none;
+}
+
+.topbar-result:hover,
+.topbar-result:focus-visible {
+  background: var(--slate-50);
+}
+
+.topbar-result-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 0.7rem;
+  background: var(--green-50);
+  color: var(--green-700);
+}
+
+.topbar-result-title,
+.topbar-result-meta {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topbar-result-title {
+  font-weight: 700;
+}
+
+.topbar-result-meta {
+  color: var(--fg-subtle);
+  font-size: 0.82rem;
+}
+
+.topbar-panel-empty {
+  padding: 1rem;
+  color: var(--fg-subtle);
+  text-align: center;
+}
+
+.topbar-help-section {
+  padding: 0.45rem;
+}
+
+.topbar-help-section + .topbar-help-section {
+  border-top: 1px solid var(--border);
+}
+
+.topbar-help-row {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  gap: 0.65rem;
+  align-items: center;
+  padding: 0.5rem 0.6rem;
+  color: var(--fg);
+}
+
+.topbar-help-row .mono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  border: 1px solid var(--border);
+  border-radius: 0.45rem;
+  background: var(--slate-50);
+  color: var(--fg-subtle);
+}
+
+.topbar-search:focus-within {
+  border-color: var(--green-600);
+  box-shadow: 0 0 0 3px var(--green-100);
 }
 
 .metric-card {
@@ -583,7 +725,10 @@ body {
   border-radius: 1rem;
   border: 1px solid var(--border);
   background: var(--surface);
-  transition: border-color 120ms ease, transform 120ms ease, box-shadow 120ms ease;
+  transition:
+    border-color 120ms ease,
+    transform 120ms ease,
+    box-shadow 120ms ease;
 }
 
 .product-card:hover {
@@ -788,7 +933,7 @@ body.nav-open .app-scrim {
     flex-wrap: wrap;
   }
 
-  .topbar-search {
+  .topbar-search-wrap {
     order: 3;
     width: 100%;
   }
@@ -818,7 +963,9 @@ body.nav-open .app-scrim {
   border: 1px solid var(--border);
   background: var(--surface);
   cursor: pointer;
-  transition: border-color 120ms ease, color 120ms ease;
+  transition:
+    border-color 120ms ease,
+    color 120ms ease;
 }
 
 .chip-action:hover {
@@ -853,7 +1000,9 @@ body.nav-open .app-scrim {
   box-shadow: var(--shadow-lg);
   opacity: 0;
   transform: translateY(8px);
-  transition: opacity 200ms ease, transform 200ms ease;
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease;
 }
 
 .toast-note.show {
@@ -1165,7 +1314,9 @@ body.nav-open .app-scrim {
   border: 1px solid var(--border-strong);
   border-radius: 0.75rem;
   background: var(--surface);
-  transition: border-color 120ms ease, box-shadow 120ms ease;
+  transition:
+    border-color 120ms ease,
+    box-shadow 120ms ease;
 }
 
 .auth-input:focus-within {

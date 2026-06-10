@@ -8,7 +8,7 @@
 > setup, design token, DB table, run command, service, port, or env var, update the matching
 > section here and bump the date below. Treat the update as part of the change, not a follow-up.
 >
-> Last updated: 2026-06-08 (added BUSINESS_RULES.md documenting extracted business rules).
+> Last updated: 2026-06-10 (wired topbar global search and action panels).
 >
 > 🧭 New to the project? Start with **[PLAYBOOK.md](./PLAYBOOK.md)** — a hands-on onboarding
 > guide (client view + the path a click takes through the code) so a new dev can pick up
@@ -137,11 +137,13 @@ input in `vite.config.mjs`.
 - **api.js** — `api` client (unwraps `{data}`, throws `ApiError`, sends bearer token), base
   from `VITE_API_BASE_URL`; `auth` session store; auth calls `login`/`me`/`logout`. Shared
   helpers: `currency`, `STATUS_TONE`/`toneClass`, `formatDate` (→ "12 Aug 2026"), `initials`.
-- **shell.js** — renders sidebar/topbar, nav, nav counts, signed-in user + sign-out.
-- **page-behaviors.js** — per-page logic, dispatched by `pageId`. `POS_TAX_RATE = 0.05`
-  mirrors API for live cart preview.
+- **shell.js** — renders sidebar/topbar, nav, nav counts, signed-in user + sign-out,
+  global search (medications, patients, prescriptions) and actionable Notifications / Help panels.
+- **page-behaviors.js** — per-page logic, dispatched by `pageId`. Inventory, patients and
+  purchase orders use shared table rendering helpers for loading / empty / error / row states.
+  `POS_TAX_RATE = 0.05` mirrors API for live cart preview.
 - **ui.js** — hand-rolled `toast`, promise-based form modal (`openForm`), `statusBadge`,
-  `placeholder` (Bootstrap JS is NOT loaded, only CSS).
+  `placeholder`, `renderTableState`, `renderTableRows` (Bootstrap JS is NOT loaded, only CSS).
 - **data.js** — static chrome only (`branch` identity, `navigation`). All domain data
   comes from the API.
 

@@ -76,12 +76,22 @@ final class App
             return;
         }
 
+<<<<<<< HEAD
         $origin = $_SERVER['HTTP_ORIGIN'] ?? '' ;
         $allowedOrigins = array_map('trim', explode(',', $_ENV['ALLOWED_ORIGINS'] ?? ''));
 
         if (in_array($origin, $allowedOrigins, true)){
             header("Access-Control-Allow-Origin: $origin");
         }
+=======
+        $origin = (string) ($_SERVER['HTTP_ORIGIN'] ?? '');
+        $allowedOrigins = (array) Config::get('cors.allowed_origins', []);
+
+        if ($origin !== '' && in_array($origin, $allowedOrigins, true)) {
+            header("Access-Control-Allow-Origin: $origin");
+        }
+
+>>>>>>> ade85580d76035a407d02c6b70be06a70cf7599d
         header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
         header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
