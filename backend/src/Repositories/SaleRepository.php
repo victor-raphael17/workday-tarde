@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
+use App\Support\Pagination;
+
 /**
  * Data access for point-of-sale sales and their line items.
  */
@@ -12,21 +14,30 @@ final class SaleRepository extends Repository
     private const COLUMNS = 'id, code, patient_id, subtotal, tax, total, payment_method, state, created_at, updated_at';
 
     /**
-     * @return array<int, array<string, mixed>>
+     * @return array<int, array<string, mixed>>|array{items: array<int, array<string, mixed>>, pagination: array<string, int>}
      */
-    public function all(?string $state = null): array
+    public function all(?string $state = null, ?Pagination $pagination = null): array
     {
-        $sql = 'SELECT ' . self::COLUMNS . ' FROM sales';
         $bindings = [];
+        $whereSql = '';
 
         if ($state !== null && $state !== '') {
-            $sql .= ' WHERE state = :state';
+            $whereSql = ' WHERE state = :state';
             $bindings['state'] = $state;
         }
 
-        $sql .= ' ORDER BY created_at DESC';
+        $itemsSql = 'SELECT ' . self::COLUMNS . ' FROM sales' . $whereSql . ' ORDER BY created_at DESC';
 
-        return $this->fetchAll($sql, $bindings);
+        if ($pagination === null) {
+            return $this->fetchAll($itemsSql, $bindings);
+        }
+
+        return $this->paginate(
+            $itemsSql,
+            'SELECT COUNT(*) AS total FROM sales' . $whereSql,
+            $bindings,
+            $pagination
+        );
     }
 
     /**

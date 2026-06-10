@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
+use App\Support\Pagination;
+
 /**
  * Data access for suppliers.
  */
@@ -12,11 +14,22 @@ final class SupplierRepository extends Repository
     private const COLUMNS = 'id, name, contact_email, phone, created_at, updated_at';
 
     /**
-     * @return array<int, array<string, mixed>>
+     * @return array<int, array<string, mixed>>|array{items: array<int, array<string, mixed>>, pagination: array<string, int>}
      */
-    public function all(): array
+    public function all(?Pagination $pagination = null): array
     {
-        return $this->fetchAll('SELECT ' . self::COLUMNS . ' FROM suppliers ORDER BY name ASC');
+        $itemsSql = 'SELECT ' . self::COLUMNS . ' FROM suppliers ORDER BY name ASC';
+
+        if ($pagination === null) {
+            return $this->fetchAll($itemsSql);
+        }
+
+        return $this->paginate(
+            $itemsSql,
+            'SELECT COUNT(*) AS total FROM suppliers',
+            [],
+            $pagination
+        );
     }
 
     /**

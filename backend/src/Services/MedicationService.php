@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Core\Exceptions\DomainException;
 use App\Core\Exceptions\NotFoundException;
 use App\Repositories\MedicationRepository;
+use App\Support\Pagination;
 
 /**
  * Business logic for the medication catalogue and stock control.
@@ -23,16 +24,22 @@ final class MedicationService
 
     public function __construct(
         private readonly MedicationRepository $medications = new MedicationRepository(),
-    ) {
-    }
+    ) {}
 
     /**
      * @param array{search?: string, category?: string, controlled?: bool} $filters
-     * @return array<int, array<string, mixed>>
+     * @return array{items: array<int, array<string, mixed>>, pagination: array<string, int>}
      */
-    public function list(array $filters = []): array
+    public function list(array $filters = [], ?Pagination $pagination = null): array
     {
-        return array_map([$this, 'present'], $this->medications->all($filters));
+        $pagination ??= new Pagination();
+
+        $page = $this->medications->all($filters, $pagination);
+
+        return [
+            'items'      => array_map([$this, 'present'], $page['items']),
+            'pagination' => $page['pagination'],
+        ];
     }
 
     /**

@@ -10,6 +10,7 @@ use App\Core\Exceptions\NotFoundException;
 use App\Repositories\MedicationRepository;
 use App\Repositories\PurchaseOrderRepository;
 use App\Repositories\SupplierRepository;
+use App\Support\Pagination;
 
 /**
  * Business logic for restocking via purchase orders.
@@ -36,11 +37,18 @@ final class PurchaseOrderService
     }
 
     /**
-     * @return array<int, array<string, mixed>>
+     * @return array{items: array<int, array<string, mixed>>, pagination: array<string, int>}
      */
-    public function list(?string $state = null): array
+    public function list(?string $state = null, ?Pagination $pagination = null): array
     {
-        return array_map([$this, 'present'], $this->orders->all($state));
+        $pagination ??= new Pagination();
+
+        $page = $this->orders->all($state, $pagination);
+
+        return [
+            'items'      => array_map([$this, 'present'], $page['items']),
+            'pagination' => $page['pagination'],
+        ];
     }
 
     /**

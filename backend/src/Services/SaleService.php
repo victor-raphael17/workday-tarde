@@ -10,6 +10,7 @@ use App\Core\Exceptions\DomainException;
 use App\Core\Exceptions\NotFoundException;
 use App\Repositories\MedicationRepository;
 use App\Repositories\SaleRepository;
+use App\Support\Pagination;
 
 /**
  * Business logic for the point of sale.
@@ -29,11 +30,18 @@ final class SaleService
     }
 
     /**
-     * @return array<int, array<string, mixed>>
+     * @return array{items: array<int, array<string, mixed>>, pagination: array<string, int>}
      */
-    public function list(?string $state = null): array
+    public function list(?string $state = null, ?Pagination $pagination = null): array
     {
-        return array_map([$this, 'presentSummary'], $this->sales->all($state));
+        $pagination ??= new Pagination();
+
+        $page = $this->sales->all($state, $pagination);
+
+        return [
+            'items'      => array_map([$this, 'presentSummary'], $page['items']),
+            'pagination' => $page['pagination'],
+        ];
     }
 
     /**

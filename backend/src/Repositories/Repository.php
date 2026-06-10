@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repositories;
 
 use App\Core\Database;
+use App\Support\Pagination;
 use PDO;
 
 /**
@@ -47,6 +48,35 @@ abstract class Repository
         $stmt->execute($bindings);
 
         return $stmt->fetchAll();
+    }
+
+    /**
+     * Fetch one page of rows and the pagination metadata for a matching count query.
+     *
+     * @param array<string, mixed> $bindings
+     * @return array{items: array<int, array<string, mixed>>, pagination: array<string, int>}
+     */
+    protected function paginate(
+        string $itemsSql,
+        string $countSql,
+        array $bindings,
+        Pagination $pagination
+    ): array {
+        $total = (int) ($this->fetchOne($countSql, $bindings)['total'] ?? 0);
+
+        $items = $this->fetchAll(
+            $itemsSql . ' LIMIT :limit OFFSET :offset',
+            [
+                ...$bindings,
+                'limit'  => $pagination->perPage,
+                'offset' => $pagination->offset(),
+            ]
+        );
+
+        return [
+            'items'      => $items,
+            'pagination' => $pagination->meta($total),
+        ];
     }
 
     /**

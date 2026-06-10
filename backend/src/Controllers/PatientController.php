@@ -16,14 +16,16 @@ final class PatientController extends Controller
 {
     public function __construct(
         private readonly PatientService $patients = new PatientService(),
-    ) {
-    }
+    ) {}
 
     public function index(Request $request): Response
     {
         $search = $request->query('search');
 
-        return Response::ok($this->patients->list($search !== null ? (string) $search : null));
+        return Response::ok($this->patients->list(
+            $search !== null ? (string) $search : null,
+            $this->pagination($request)
+        ));
     }
 
     public function show(Request $request): Response
@@ -85,8 +87,8 @@ final class PatientController extends Controller
         }
 
         return array_values(array_filter(array_map(
-            static fn ($v): string => trim((string) $v),
+            static fn($v): string => trim((string) $v),
             $value
-        ), static fn (string $v): bool => $v !== ''));
+        ), static fn(string $v): bool => $v !== ''));
     }
 }

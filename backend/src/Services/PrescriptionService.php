@@ -10,6 +10,7 @@ use App\Core\Exceptions\NotFoundException;
 use App\Repositories\MedicationRepository;
 use App\Repositories\PatientRepository;
 use App\Repositories\PrescriptionRepository;
+use App\Support\Pagination;
 
 /**
  * Business logic for the prescription pipeline: intake → verify → ready →
@@ -37,11 +38,18 @@ final class PrescriptionService
 
     /**
      * @param array{state?: string, patient_id?: int} $filters
-     * @return array<int, array<string, mixed>>
+     * @return array{items: array<int, array<string, mixed>>, pagination: array<string, int>}
      */
-    public function list(array $filters = []): array
+    public function list(array $filters = [], ?Pagination $pagination = null): array
     {
-        return array_map([$this, 'present'], $this->prescriptions->all($filters));
+        $pagination ??= new Pagination();
+
+        $page = $this->prescriptions->all($filters, $pagination);
+
+        return [
+            'items'      => array_map([$this, 'present'], $page['items']),
+            'pagination' => $page['pagination'],
+        ];
     }
 
     /**

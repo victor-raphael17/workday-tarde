@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
+use App\Support\Pagination;
+
 /**
  * Data access for purchase orders (restocking) and their line items. List rows
  * include derived aggregates (item count, total units, total cost) computed in
@@ -23,21 +25,30 @@ final class PurchaseOrderRepository extends Repository
         LEFT JOIN purchase_order_items poi ON poi.purchase_order_id = po.id";
 
     /**
-     * @return array<int, array<string, mixed>>
+     * @return array<int, array<string, mixed>>|array{items: array<int, array<string, mixed>>, pagination: array<string, int>}
      */
-    public function all(?string $state = null): array
+    public function all(?string $state = null, ?Pagination $pagination = null): array
     {
-        $sql = self::LIST_SELECT;
         $bindings = [];
+        $whereSql = '';
 
         if ($state !== null && $state !== '') {
-            $sql .= ' WHERE po.state = :state';
+            $whereSql = ' WHERE po.state = :state';
             $bindings['state'] = $state;
         }
 
-        $sql .= ' GROUP BY po.id, s.name ORDER BY po.created_at DESC';
+        $itemsSql = self::LIST_SELECT . $whereSql . ' GROUP BY po.id, s.name ORDER BY po.created_at DESC';
 
-        return $this->fetchAll($sql, $bindings);
+        if ($pagination === null) {
+            return $this->fetchAll($itemsSql, $bindings);
+        }
+
+        return $this->paginate(
+            $itemsSql,
+            'SELECT COUNT(*) AS total FROM purchase_orders po' . $whereSql,
+            $bindings,
+            $pagination
+        );
     }
 
     /**

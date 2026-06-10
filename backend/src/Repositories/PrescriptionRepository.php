@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
+use App\Support\Pagination;
+
 /**
  * Data access for prescriptions. Reads join patient and medication so the API
  * can return human-readable names alongside the foreign keys.
@@ -22,11 +24,10 @@ final class PrescriptionRepository extends Repository
 
     /**
      * @param array{state?: string, patient_id?: int} $filters
-     * @return array<int, array<string, mixed>>
+     * @return array<int, array<string, mixed>>|array{items: array<int, array<string, mixed>>, pagination: array<string, int>}
      */
-    public function all(array $filters = []): array
+    public function all(array $filters = [], ?Pagination $pagination = null): array
     {
-        $sql = self::SELECT;
         $where = [];
         $bindings = [];
 
@@ -40,13 +41,19 @@ final class PrescriptionRepository extends Repository
             $bindings['patient_id'] = $filters['patient_id'];
         }
 
-        if ($where !== []) {
-            $sql .= ' WHERE ' . implode(' AND ', $where);
+        $whereSql = $where !== [] ? ' WHERE ' . implode(' AND ', $where) : '';
+        $itemsSql = self::SELECT . $whereSql . ' ORDER BY p.created_at DESC';
+
+        if ($pagination === null) {
+            return $this->fetchAll($itemsSql, $bindings);
         }
 
-        $sql .= ' ORDER BY p.created_at DESC';
-
-        return $this->fetchAll($sql, $bindings);
+        return $this->paginate(
+            $itemsSql,
+            'SELECT COUNT(*) AS total FROM prescriptions p' . $whereSql,
+            $bindings,
+            $pagination
+        );
     }
 
     /**

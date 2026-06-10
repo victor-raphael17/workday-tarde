@@ -16,8 +16,7 @@ final class MedicationController extends Controller
 {
     public function __construct(
         private readonly MedicationService $medications = new MedicationService(),
-    ) {
-    }
+    ) {}
 
     public function index(Request $request): Response
     {
@@ -33,7 +32,10 @@ final class MedicationController extends Controller
             $filters['controlled'] = in_array(strtolower((string) $controlled), ['1', 'true', 'yes'], true);
         }
 
-        return Response::ok($this->medications->list($filters));
+        return Response::ok($this->medications->list(
+            $filters,
+            $this->pagination($request)
+        ));
     }
 
     public function show(Request $request): Response

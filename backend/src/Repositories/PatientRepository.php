@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
+use App\Support\Pagination;
+
 /**
  * Data access for patients. Allergies are stored as a Postgres TEXT[]; we
  * convert to/from a PHP array at this boundary so the rest of the app never
@@ -14,21 +16,34 @@ final class PatientRepository extends Repository
     private const COLUMNS = 'id, code, name, dob, phone, plan, allergies, last_visit, created_at, updated_at';
 
     /**
-     * @return array<int, array<string, mixed>>
+     * @return array<int, array<string, mixed>>|array{items: array<int, array<string, mixed>>, pagination: array<string, int>}
      */
-    public function all(?string $search = null): array
+    public function all(?string $search = null, ?Pagination $pagination = null): array
     {
-        $sql = 'SELECT ' . self::COLUMNS . ' FROM patients';
         $bindings = [];
+        $whereSql = '';
 
         if ($search !== null && $search !== '') {
-            $sql .= ' WHERE name ILIKE :search OR code ILIKE :search';
+            $whereSql = ' WHERE name ILIKE :search OR code ILIKE :search';
             $bindings['search'] = '%' . $search . '%';
         }
 
-        $sql .= ' ORDER BY name ASC';
+        $itemsSql = 'SELECT ' . self::COLUMNS . ' FROM patients' . $whereSql . ' ORDER BY name ASC';
 
-        return array_map([$this, 'hydrate'], $this->fetchAll($sql, $bindings));
+        if ($pagination === null) {
+            return array_map([$this, 'hydrate'], $this->fetchAll($itemsSql, $bindings));
+        }
+
+        $page = $this->paginate(
+            $itemsSql,
+            'SELECT COUNT(*) AS total FROM patients' . $whereSql,
+            $bindings,
+            $pagination
+        );
+
+        $page['items'] = array_map([$this, 'hydrate'], $page['items']);
+
+        return $page;
     }
 
     /**

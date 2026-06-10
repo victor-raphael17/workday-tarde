@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Core;
 
 use App\Core\Exceptions\NotFoundException;
+use App\Support\Pagination;
 
 /**
  * Base controller. Controllers stay thin: they validate/translate HTTP, call a
@@ -35,5 +36,16 @@ abstract class Controller
         }
 
         return (int) $value;
+    }
+
+    /**
+     * Read pagination query parameters shared by list endpoints.
+     */
+    protected function pagination(Request $request): Pagination
+    {
+        return Pagination::fromQuery(
+            $request->query('page'),
+            $request->query('per_page')
+        );
     }
 }

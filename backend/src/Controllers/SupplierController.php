@@ -21,7 +21,7 @@ final class SupplierController extends Controller
 
     public function index(Request $request): Response
     {
-        return Response::ok($this->suppliers->list());
+        return Response::ok($this->suppliers->list($this->pagination($request)));
     }
 
     public function show(Request $request): Response

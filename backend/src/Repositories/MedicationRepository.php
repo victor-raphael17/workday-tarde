@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
+use App\Support\Pagination;
+
 /**
  * Data access for the medications (stock catalogue) table.
  */
@@ -14,11 +16,10 @@ final class MedicationRepository extends Repository
 
     /**
      * @param array{search?: string, category?: string, controlled?: bool} $filters
-     * @return array<int, array<string, mixed>>
+     * @return array{items: array<int, array<string, mixed>>, pagination: array<string, int>}
      */
-    public function all(array $filters = []): array
+    public function all(array $filters = [], ?Pagination $pagination = null): array
     {
-        $sql = 'SELECT ' . self::COLUMNS . ' FROM medications';
         $where = [];
         $bindings = [];
 
@@ -37,13 +38,21 @@ final class MedicationRepository extends Repository
             $bindings['controlled'] = $filters['controlled'] ? 'true' : 'false';
         }
 
-        if ($where !== []) {
-            $sql .= ' WHERE ' . implode(' AND ', $where);
+        $whereSql = $where !== [] ? ' WHERE ' . implode(' AND ', $where) : '';
+        $itemsSql = 'SELECT ' . self::COLUMNS . ' FROM medications'
+            . $whereSql
+            . ' ORDER BY name ASC';
+
+        if ($pagination === null) {
+            return $this->fetchAll($itemsSql, $bindings);
         }
 
-        $sql .= ' ORDER BY name ASC';
-
-        return $this->fetchAll($sql, $bindings);
+        return $this->paginate(
+            $itemsSql,
+            'SELECT COUNT(*) AS total FROM medications' . $whereSql,
+            $bindings,
+            $pagination
+        );
     }
 
     /**
@@ -153,6 +162,6 @@ final class MedicationRepository extends Repository
     {
         $rows = $this->fetchAll('SELECT DISTINCT category FROM medications WHERE category IS NOT NULL ORDER BY category');
 
-        return array_map(static fn (array $r): string => (string) $r['category'], $rows);
+        return array_map(static fn(array $r): string => (string) $r['category'], $rows);
     }
 }

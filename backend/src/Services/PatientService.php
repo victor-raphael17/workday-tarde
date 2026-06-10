@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Core\Exceptions\NotFoundException;
 use App\Repositories\PatientRepository;
 use App\Repositories\PrescriptionRepository;
+use App\Support\Pagination;
 
 /**
  * Business logic for patients. A patient's "active medications" are derived
@@ -22,11 +23,18 @@ final class PatientService
     }
 
     /**
-     * @return array<int, array<string, mixed>>
+     * @return array{items: array<int, array<string, mixed>>, pagination: array<string, int>}
      */
-    public function list(?string $search = null): array
+    public function list(?string $search = null, ?Pagination $pagination = null): array
     {
-        return array_map([$this, 'present'], $this->patients->all($search));
+        $pagination ??= new Pagination();
+
+        $page = $this->patients->all($search, $pagination);
+
+        return [
+            'items'      => array_map([$this, 'present'], $page['items']),
+            'pagination' => $page['pagination'],
+        ];
     }
 
     /**

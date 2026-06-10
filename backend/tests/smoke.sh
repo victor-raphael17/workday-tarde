@@ -49,7 +49,7 @@ json_get() {
 first_medication_id() {
   php -r '
     $payload = json_decode(stream_get_contents(STDIN), true);
-    foreach (($payload["data"] ?? []) as $medication) {
+    foreach (($payload["data"]["items"] ?? []) as $medication) {
         if (($medication["controlled"] ?? null) === false
             && ($medication["recalled"] ?? null) === false
             && (int) ($medication["on_hand"] ?? 0) > 10
@@ -148,7 +148,7 @@ assert_eq "oversell returns 422" "422" "$CODE"
 assert_eq "stock unchanged after rejected sale" "$BEFORE" "$(on_hand "$MED_ID")"
 
 echo "== Receiving a purchase order adds stock =="
-SUPPLIER_ID=$(curl -s -H "Authorization: Bearer $TOKEN" "$API/api/suppliers" | json_get 'data.0.id')
+SUPPLIER_ID=$(curl -s -H "Authorization: Bearer $TOKEN" "$API/api/suppliers" | json_get 'data.items.0.id')
 BEFORE=$(on_hand "$MED_ID")
 PO=$(curl -s -X POST "$API/api/purchase-orders" -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
   -d "{\"supplier_id\":$SUPPLIER_ID,\"items\":[{\"medication_id\":$MED_ID,\"units\":25,\"unit_cost\":4.5}]}")
@@ -165,7 +165,7 @@ CODE=$(status_code PATCH "/api/purchase-orders/$PO_ID/state" '{"state":"received
 assert_eq "double-receive rejected (422)" "422" "$CODE"
 
 echo "== Dispensing a prescription draws stock down =="
-PATIENT_ID=$(curl -s -H "Authorization: Bearer $TOKEN" "$API/api/patients" | json_get 'data.0.id')
+PATIENT_ID=$(curl -s -H "Authorization: Bearer $TOKEN" "$API/api/patients" | json_get 'data.items.0.id')
 BEFORE=$(on_hand "$MED_ID")
 RX=$(curl -s -X POST "$API/api/prescriptions" -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
   -d "{\"patient_id\":$PATIENT_ID,\"medication_id\":$MED_ID,\"quantity\":4,\"unit\":\"tabs\",\"prescriber\":\"Dr. Smoke\"}")

@@ -30,7 +30,10 @@ final class PrescriptionController extends Controller
             $filters['patient_id'] = (int) $patientId;
         }
 
-        return Response::ok($this->prescriptions->list($filters));
+        return Response::ok($this->prescriptions->list(
+            $filters,
+            $this->pagination($request)
+        ));
     }
 
     public function show(Request $request): Response

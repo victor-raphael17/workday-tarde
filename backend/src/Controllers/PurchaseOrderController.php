@@ -23,7 +23,10 @@ final class PurchaseOrderController extends Controller
     {
         $state = $request->query('state');
 
-        return Response::ok($this->orders->list($state !== null ? (string) $state : null));
+        return Response::ok($this->orders->list(
+            $state !== null ? (string) $state : null,
+            $this->pagination($request)
+        ));
     }
 
     public function show(Request $request): Response
