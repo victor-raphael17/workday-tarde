@@ -6,7 +6,14 @@ import {
   initials,
   toneClass,
 } from './api.js';
-import { openForm, placeholder, statusBadge, toast } from './ui.js';
+import {
+  openForm,
+  placeholder,
+  renderTableRows,
+  renderTableState,
+  statusBadge,
+  toast,
+} from './ui.js';
 import { escapeHtml, escapeHtmlAttr } from './sanitize.js';
 
 const POS_TAX_RATE = 0.05; // mirrors the API's TAX_RATE for the live cart preview
@@ -287,16 +294,17 @@ async function bindInventory() {
       selectedId = visible.length ? visible[0].id : null;
     }
 
-    tbody.innerHTML = visible.length
-      ? visible
-          .map((m) => {
-            const badge = badgeFor(m);
-            const active = m.id === selectedId ? 'table-active' : '';
-            const expiryClass =
-              m.status === 'expiring' || m.status === 'expired'
-                ? 'text-warning-emphasis'
-                : 'text-body-secondary';
-            return `
+    renderTableRows(tbody, visible, {
+      colspan: 7,
+      emptyMessage: 'No medications match your filters.',
+      renderRow: (m) => {
+        const badge = badgeFor(m);
+        const active = m.id === selectedId ? 'table-active' : '';
+        const expiryClass =
+          m.status === 'expiring' || m.status === 'expired'
+            ? 'text-warning-emphasis'
+            : 'text-body-secondary';
+        return `
               <tr data-inventory-row data-id="${escapeHtmlAttr(m.id)}" class="${active}" role="button" tabindex="0">
                 <td><div class="fw-semibold">${escapeHtml(m.name)}</div><div class="small text-body-secondary">${escapeHtml([m.strength, m.form].filter(Boolean).join(' · '))}</div></td>
                 <td class="mono text-body-secondary">${escapeHtml(m.sku)}</td>
@@ -306,9 +314,8 @@ async function bindInventory() {
                 <td>${statusBadge(badge.tone, badge.label)}</td>
                 <td class="text-end mono">${escapeHtml(currency.format(m.price))}</td>
               </tr>`;
-          })
-          .join('')
-      : `<tr><td colspan="7">${placeholder('No medications match your filters.')}</td></tr>`;
+      },
+    });
 
     tbody.querySelectorAll('[data-inventory-row]').forEach((row) => {
       const select = () => {
@@ -332,13 +339,16 @@ async function bindInventory() {
   };
 
   const load = async () => {
-    tbody.innerHTML = `<tr><td colspan="7">${placeholder('Loading inventory…')}</td></tr>`;
+    renderTableState(tbody, 'Loading inventory…', { colspan: 7 });
     try {
       medications = await api.medications();
       updateChipCounts();
       render();
     } catch (error) {
-      tbody.innerHTML = `<tr><td colspan="7">${placeholder(reportError(error), 'error')}</td></tr>`;
+      renderTableState(tbody, reportError(error), {
+        colspan: 7,
+        tone: 'error',
+      });
     }
   };
 
@@ -933,11 +943,12 @@ async function bindPatients() {
       selectedId = visible.length ? visible[0].id : null;
     }
 
-    tbody.innerHTML = visible.length
-      ? visible
-          .map((p) => {
-            const active = p.id === selectedId ? 'table-active' : '';
-            return `
+    renderTableRows(tbody, visible, {
+      colspan: 6,
+      emptyMessage: 'No patients match your search.',
+      renderRow: (p) => {
+        const active = p.id === selectedId ? 'table-active' : '';
+        return `
               <tr data-patient-row data-id="${escapeHtmlAttr(p.id)}" class="${active}" role="button" tabindex="0">
                 <td><div class="fw-semibold">${escapeHtml(p.name)}</div></td>
                 <td class="mono text-body-secondary">${escapeHtml(p.code)}</td>
@@ -946,9 +957,8 @@ async function bindPatients() {
                 <td class="text-end mono">${escapeHtml(p.active ?? '—')}</td>
                 <td class="mono text-body-secondary">${escapeHtml(formatDate(p.last_visit))}</td>
               </tr>`;
-          })
-          .join('')
-      : `<tr><td colspan="6">${placeholder('No patients match your search.')}</td></tr>`;
+      },
+    });
 
     tbody.querySelectorAll('[data-patient-row]').forEach((row) => {
       const select = () => {
@@ -971,12 +981,15 @@ async function bindPatients() {
   };
 
   const load = async () => {
-    tbody.innerHTML = `<tr><td colspan="6">${placeholder('Loading patients…')}</td></tr>`;
+    renderTableState(tbody, 'Loading patients…', { colspan: 6 });
     try {
       patients = await api.patients();
       render();
     } catch (error) {
-      tbody.innerHTML = `<tr><td colspan="6">${placeholder(reportError(error), 'error')}</td></tr>`;
+      renderTableState(tbody, reportError(error), {
+        colspan: 6,
+        tone: 'error',
+      });
     }
   };
 
@@ -1142,11 +1155,12 @@ async function bindOrders() {
       selectedId = orders.length ? orders[0].id : null;
     }
 
-    tbody.innerHTML = orders.length
-      ? orders
-          .map((o) => {
-            const active = o.id === selectedId ? 'table-active' : '';
-            return `
+    renderTableRows(tbody, orders, {
+      colspan: 7,
+      emptyMessage: 'No purchase orders yet.',
+      renderRow: (o) => {
+        const active = o.id === selectedId ? 'table-active' : '';
+        return `
               <tr data-order-row data-id="${escapeHtmlAttr(o.id)}" class="${active}" role="button" tabindex="0">
                 <td class="mono fw-semibold">${escapeHtml(o.code)}</td>
                 <td>${escapeHtml(o.supplier.name)}</td>
@@ -1156,9 +1170,8 @@ async function bindOrders() {
                 <td>${statusBadge(o.state, PO_STATE_LABEL[o.state] || o.state)}</td>
                 <td class="text-end mono">${escapeHtml(currency.format(o.total_cost))}</td>
               </tr>`;
-          })
-          .join('')
-      : `<tr><td colspan="7">${placeholder('No purchase orders yet.')}</td></tr>`;
+      },
+    });
 
     tbody.querySelectorAll('[data-order-row]').forEach((row) => {
       const select = () => {
@@ -1196,12 +1209,15 @@ async function bindOrders() {
   };
 
   const load = async () => {
-    tbody.innerHTML = `<tr><td colspan="7">${placeholder('Loading orders…')}</td></tr>`;
+    renderTableState(tbody, 'Loading orders…', { colspan: 7 });
     try {
       orders = await api.purchaseOrders();
       render();
     } catch (error) {
-      tbody.innerHTML = `<tr><td colspan="7">${placeholder(reportError(error), 'error')}</td></tr>`;
+      renderTableState(tbody, reportError(error), {
+        colspan: 7,
+        tone: 'error',
+      });
     }
     await loadBanner();
   };

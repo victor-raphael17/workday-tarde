@@ -38,6 +38,20 @@ export function placeholder(message, tone = 'muted') {
   return `<div class="muted-note text-center w-100 py-4 ${cls}">${escapeHtml(message)}</div>`;
 }
 
+export function renderTableState(tbody, message, { colspan, tone = 'muted' }) {
+  tbody.innerHTML = `<tr><td colspan="${escapeHtmlAttr(colspan)}">${placeholder(message, tone)}</td></tr>`;
+}
+
+export function renderTableRows(
+  tbody,
+  rows,
+  { colspan, emptyMessage, renderRow }
+) {
+  tbody.innerHTML = rows.length
+    ? rows.map(renderRow).join('')
+    : `<tr><td colspan="${escapeHtmlAttr(colspan)}">${placeholder(emptyMessage)}</td></tr>`;
+}
+
 /**
  * Open a modal form. `fields` is an array of:
  *   { name, label, type?, required?, value?, placeholder?, options?, help? }
