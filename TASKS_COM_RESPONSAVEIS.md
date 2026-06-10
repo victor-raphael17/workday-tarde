@@ -294,10 +294,17 @@ Atualizado conforme `main` em 2026-06-10.
   - Depende idealmente de:
     - `feature/backend-pagination`.
 
-- [ ] **Extrair helper reutilizavel de render de tabela**
+- [x] **Extrair helper reutilizavel de render de tabela**
   - Responsavel sugerido: Frontend Dev #4.
-  - Branch sugerida: `feature/table-render-helper`.
-  - Pode ser feito depois de paginacao para evitar retrabalho.
+  - Branch: `feature/table-render-helper`.
+  - Arquivos:
+    - `frontend/assets/js/ui.js`
+    - `frontend/assets/js/page-behaviors.js`
+    - `frontend/assets/js/ui.test.js`
+  - Resultado:
+    - `renderTableState` centraliza loading/erro em tabelas.
+    - `renderTableRows` centraliza renderizacao de linhas e estado vazio.
+    - Inventario, pacientes e pedidos passaram a usar o helper.
 
 - [ ] **Limpeza de wrappers sem uso em `api.js`**
   - Responsavel sugerido: Frontend Dev #1.

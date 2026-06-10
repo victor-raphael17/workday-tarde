@@ -1,5 +1,12 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { statusBadge, placeholder, toast, openForm } from './ui.js';
+import {
+  statusBadge,
+  placeholder,
+  renderTableRows,
+  renderTableState,
+  toast,
+  openForm,
+} from './ui.js';
 
 describe('statusBadge', () => {
   it('in status', () => {
@@ -22,6 +29,49 @@ describe('placeholder', () => {
 
   it('default class', () => {
     expect(placeholder('Teste')).toContain('text-body-secondary');
+  });
+});
+
+describe('table helpers', () => {
+  beforeEach(() => {
+    document.body.innerHTML = '<table><tbody></tbody></table>';
+  });
+
+  it('renderiza linhas de tabela', () => {
+    const tbody = document.querySelector('tbody');
+
+    renderTableRows(tbody, ['A', 'B'], {
+      colspan: 2,
+      emptyMessage: 'Vazio',
+      renderRow: (value) => `<tr><td>${value}</td></tr>`,
+    });
+
+    expect(tbody.querySelectorAll('tr')).toHaveLength(2);
+    expect(tbody.textContent).toContain('A');
+    expect(tbody.textContent).toContain('B');
+  });
+
+  it('renderiza estado vazio com colspan', () => {
+    const tbody = document.querySelector('tbody');
+
+    renderTableRows(tbody, [], {
+      colspan: 3,
+      emptyMessage: 'Sem dados',
+      renderRow: (value) => `<tr><td>${value}</td></tr>`,
+    });
+
+    expect(tbody.querySelector('td').getAttribute('colspan')).toBe('3');
+    expect(tbody.textContent).toContain('Sem dados');
+  });
+
+  it('renderiza estado de erro', () => {
+    const tbody = document.querySelector('tbody');
+
+    renderTableState(tbody, 'Falhou', { colspan: 4, tone: 'error' });
+
+    expect(tbody.querySelector('td').getAttribute('colspan')).toBe('4');
+    expect(tbody.querySelector('.text-danger')).not.toBeNull();
+    expect(tbody.textContent).toContain('Falhou');
   });
 });
 

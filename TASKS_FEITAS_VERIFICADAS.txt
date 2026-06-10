@@ -130,6 +130,22 @@ Validacao Docker:
 - `curl http://localhost:4173/`: HTTP 200.
 - `API=http://localhost:8080 bash backend/tests/smoke.sh`: 20 passed, 0 failed.
 
+### Helper reutilizavel de render de tabela
+
+Status: feito em `feature/table-render-helper`.
+
+Task/ajuste:
+- Extrair helpers compartilhados para renderizar estados e linhas de tabelas do frontend.
+- Aplicar em inventario, pacientes e pedidos.
+- Adicionar testes unitarios para os helpers.
+
+Arquivos:
+- `frontend/assets/js/ui.js`
+- `frontend/assets/js/page-behaviors.js`
+- `frontend/assets/js/ui.test.js`
+- `PROJECT_CONTEXT.md`
+- `TASKS_COM_RESPONSAVEIS.md`
+
 ## Ainda pendente
 
 - Completar cobertura de `api.js` para parsing de envelope de sucesso/erro.
@@ -144,7 +160,6 @@ Validacao Docker:
 - `aria-live` em toasts/estados.
 - Loading state e prevencao de duplo-submit nos forms.
 - Paginacao backend/frontend.
-- Extrair helper reutilizavel de render de tabela.
 - Limpeza de wrappers sem uso em `api.js`.
 - CSS potencialmente nao usado.
 - Endpoints sem consumidor de UI.
