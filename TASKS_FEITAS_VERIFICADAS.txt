@@ -178,6 +178,24 @@ Validacao:
 - `npm run lint:check --workspace frontend`: passou.
 - `npm run build --workspace frontend`: passou.
 
+### Analise de CSS potencialmente nao usado
+
+Status: feito em `cssInutil`.
+
+Task/ajuste:
+- Rodar analise PurgeCSS em dry-run para avaliar remocao segura de CSS potencialmente nao usado.
+- Registrar decisao de nao remover regras automaticamente, porque a diferenca observada foi pequena e a cobertura estatica pode nao capturar classes dinamicas.
+
+Arquivo:
+- `frontend/assets/css/purgecss.config.cjs`
+
+Validacao/conclusao:
+- Analise reportada na branch: CSS original com 21186 caracteres e CSS processado com 20946 caracteres.
+- Diferenca aproximada de 1%; remocao automatica considerada insegura neste momento.
+- `npm test --workspace frontend -- --run`: passou com 44 testes.
+- `npm run lint:check --workspace frontend`: passou.
+- `npm run build --workspace frontend`: passou.
+
 ## Ainda pendente
 
 - Pipeline de CI.
@@ -190,7 +208,6 @@ Validacao:
 - Loading state e prevencao de duplo-submit nos forms.
 - Paginacao backend/frontend.
 - Limpeza de wrappers sem uso em `api.js`.
-- CSS potencialmente nao usado.
 - Endpoints sem consumidor de UI.
 - Logging estruturado de erros.
 - Suite backend mais completa com PHPUnit (o `composer.json` ja lista PHPUnit e ha `AuthMiddlewareTest`, mas falta uma suite abrangente para services/validator e execucao documentada).

@@ -344,10 +344,19 @@ Atualizado conforme `main` em 2026-06-10.
   - Observacao:
     - nao remover `api.me`.
 
-- [ ] **CSS potencialmente nao usado**
+- [x] **CSS potencialmente nao usado**
   - Responsavel sugerido: Frontend Dev #1.
-  - Branch sugerida: `chore/frontend-css-coverage`.
-  - Primeiro rodar PurgeCSS dry-run ou DevTools Coverage.
+  - Branch: `cssInutil`.
+  - Arquivo:
+    - `frontend/assets/css/purgecss.config.cjs`
+  - Resultado:
+    - PurgeCSS dry-run foi preparado para cruzar HTML/JS com `frontend/assets/css/app.css`.
+    - A analise reportada apontou diferenca aproximada de 1%.
+    - Nao houve remocao de CSS, porque o ganho e pequeno e a remocao automatica seria insegura para classes dinamicas.
+  - Validacao:
+    - `npm test --workspace frontend -- --run`: 44 testes passaram.
+    - `npm run lint:check --workspace frontend`: passou.
+    - `npm run build --workspace frontend`: passou.
 
 - [ ] **Endpoints sem consumidor de UI**
   - Responsavel sugerido: Tech lead decide escopo antes de atribuir.
