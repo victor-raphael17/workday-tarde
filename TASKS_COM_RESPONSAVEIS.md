@@ -2,13 +2,15 @@
 
 Baseado no `TASKS.md`, no guia colado para **Backend Dev #1** e na divisao de devs informada.
 
+Atualizado conforme `main` em 2026-06-10.
+
 ## Mapa de responsaveis
 
 | Papel | Responsavel | Foco |
 | --- | --- | --- |
 | Backend Dev #1 | Nicolas | Auth middleware / proteger rotas autenticadas |
 | Backend Dev #2 | Domareski | Proxima task backend dependente do auth |
-| Backend Dev #5 | Gabriel Luis | Melhorias backend / tarefa backend posterior |
+| Backend Dev #5 | Gabriel Luis | Rate limiting concluido / melhorias backend restantes |
 | Frontend Dev #1 | Leonardo | Primeira task frontend pendente |
 | Frontend Dev #2 | Joao B | Segunda task frontend pendente |
 | Frontend Dev #3 | Morozini | Terceira task frontend pendente |
@@ -23,6 +25,40 @@ Baseado no `TASKS.md`, no guia colado para **Backend Dev #1** e na divisao de de
 | `feature/frontend-tests-xss-clean` | Frontend Dev #4 - A definir | licori12 | Mergeado na `main`; testes/build validados |
 | `feature-add-eslint-and-prettier-configuration-with-documentation` | Frontend Dev #1 - Leonardo | licori12 | Mergeado na `main`; lint/test/build validados |
 | `backend-dev-2-auth-router` | Backend Dev #2 - Domareski | licori12 | Mergeado na `main`; backend/auth, lint/test/build validados |
+| `feature-rate-limit` | Backend Dev #5 - Gabriel Luis | licori12 | Mergeado na `main`; rate limiting implementado e teste smoke especifico adicionado |
+
+### Backend Dev #1 - Nicolas
+
+- [x] **Proteger rotas autenticadas com middleware**
+  - Branch integrada: `backend-dev-2-auth-router`.
+  - Arquivos principais:
+    - `backend/routes/api.php`
+    - `backend/src/Core/Middleware/AuthMiddleware.php`
+    - `backend/src/Core/Router.php`
+    - `backend/src/Core/Request.php`
+    - `backend/src/Core/RequestInterface.php`
+    - `backend/src/Core/Response.php`
+    - `backend/src/Services/AuthServiceInterface.php`
+    - `backend/tests/Middleware/AuthMiddlewareTest.php`
+  - Resultado:
+    - rotas protegidas usam `AuthMiddleware`.
+    - login permanece publico.
+    - token ausente/invalido retorna 401.
+
+### Backend Dev #5 - Gabriel Luis
+
+- [x] **Rate limiting / protecao contra brute-force no login**
+  - Branch integrada: `feature-rate-limit`.
+  - Arquivos principais:
+    - `backend/src/Support/RateLimit.php`
+    - `backend/src/Controllers/AuthController.php`
+    - `backend/src/Core/Response.php`
+    - `backend/tests/smoke.sh`
+  - Resultado:
+    - login limitado a 5 tentativas falhadas por 5 minutos por email.
+    - 6a tentativa falhada retorna 429.
+    - tentativas bloqueadas geram log.
+    - `Response::tooManyRequests()` foi adicionado.
 
 ### Frontend Dev #4 - A definir
 
@@ -34,7 +70,7 @@ Baseado no `TASKS.md`, no guia colado para **Backend Dev #1** e na divisao de de
     - `frontend/assets/js/ui.test.js`
     - `frontend/assets/js/sanitize.test.js`
   - Validacao:
-    - `npm run test --workspace frontend -- --run`: 31 testes passaram.
+    - `npm run test --workspace frontend -- --run`: 34 testes passaram.
     - `npm run build`: passou.
   - Pendencia pequena:
     - adicionar testes diretos para parsing do envelope de sucesso/erro em `api.js`.
@@ -47,18 +83,33 @@ Baseado no `TASKS.md`, no guia colado para **Backend Dev #1** e na divisao de de
     - `frontend/assets/js/shell.js`
     - `frontend/assets/js/ui.js`
 
+### Frontend Dev #1 - Leonardo
+
+- [x] **Adicionar ESLint + Prettier**
+  - Branch integrada: `feature-add-eslint-and-prettier-configuration-with-documentation`.
+  - Arquivos principais:
+    - `frontend/eslint.config.js`
+    - `frontend/.prettierrc`
+    - `frontend/LINTING.md`
+    - `frontend/package.json`
+    - `package.json`
+    - `package-lock.json`
+  - Resultado:
+    - scripts de lint, formatacao e checagem foram adicionados.
+    - documentacao de lint foi adicionada em `frontend/LINTING.md`.
+
 ## Backend
 
 ### Backend Dev #1 - Nicolas
 
-- [ ] **Proteger rotas autenticadas com middleware**
-  - Branch sugerida: `feature/backend-auth-middleware`.
+- [x] **Proteger rotas autenticadas com middleware**
+  - Branch integrada: `backend-dev-2-auth-router`.
   - Arquivos principais:
     - `backend/routes/api.php`
     - `backend/src/Core/Router.php`
     - `backend/src/Core/Request.php`
     - `backend/src/Core/Response.php`
-    - novo arquivo sugerido: `backend/src/Core/Middleware/AuthMiddleware.php`
+    - `backend/src/Core/Middleware/AuthMiddleware.php`
   - Objetivo:
     - exigir bearer token em endpoints protegidos.
     - manter login publico.
@@ -94,13 +145,15 @@ Baseado no `TASKS.md`, no guia colado para **Backend Dev #1** e na divisao de de
 
 ### Backend Dev #5 - Gabriel Luis
 
-- [ ] **Rate limiting / protecao contra brute-force no login**
-  - Branch sugerida: `feature/login-rate-limit`.
+- [x] **Rate limiting / protecao contra brute-force no login**
+  - Branch integrada: `feature-rate-limit`.
   - Arquivos:
     - `backend/src/Controllers/AuthController.php`
-    - `backend/src/Services/AuthService.php`
+    - `backend/src/Support/RateLimit.php`
+    - `backend/src/Core/Response.php`
+    - `backend/tests/smoke.sh`
   - Objetivo:
-    - limitar tentativas por IP/email.
+    - limitar tentativas por email.
     - responder 429 ao estourar limite.
 
 - [ ] **Logging estruturado de erros**
@@ -130,10 +183,13 @@ Baseado no `TASKS.md`, no guia colado para **Backend Dev #1** e na divisao de de
 
 ### Frontend Dev #1 - Leonardo
 
-- [ ] **Adicionar ESLint + Prettier**
-  - Branch sugerida: `feature/frontend-lint-format`.
+- [x] **Adicionar ESLint + Prettier**
+  - Branch integrada: `feature-add-eslint-and-prettier-configuration-with-documentation`.
   - Arquivo:
     - `frontend/package.json`
+    - `frontend/eslint.config.js`
+    - `frontend/.prettierrc`
+    - `frontend/LINTING.md`
   - Objetivo:
     - padronizar JS.
     - preparar o projeto para CI.
@@ -262,11 +318,11 @@ Baseado no `TASKS.md`, no guia colado para **Backend Dev #1** e na divisao de de
 
 ## Ordem sugerida de execucao
 
-1. Nicolas: `feature/backend-auth-middleware`
-2. Leonardo: `feature/frontend-lint-format`
-3. Gabriel Luis: `feature/backend-error-logging` ou `feature/login-rate-limit`
-4. Domareski: `feature/stock-adjustment-audit`
-5. Joao B: `feature/frontend-token-expiry`
-6. Morozini: `feature/topbar-global-search`
-7. Frontend Dev #4: `feature/modal-focus-trap` + `feature/ui-aria-live`
-8. Backend Dev #2 / Frontend Dev #2: paginacao backend e depois frontend
+1. Gabriel Luis: `feature/backend-error-logging` ou `feature/configurable-cors`
+2. Domareski: `feature/stock-adjustment-audit`
+3. Joao B: `feature/frontend-token-expiry`
+4. Morozini: `feature/topbar-global-search`
+5. Frontend Dev #4: `feature/modal-focus-trap` + `feature/ui-aria-live`
+6. Backend Dev #2 / Frontend Dev #2: paginacao backend e depois frontend
+7. Frontend Dev #1: `feature/frontend-api-tests`
+8. Tech lead ou dupla Frontend Dev #1 + Backend Dev #5: `feature/ci-pipeline`

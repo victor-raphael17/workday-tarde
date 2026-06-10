@@ -1,6 +1,6 @@
 # Tasks feitas e verificadas
 
-Data da revisao: 2026-06-09
+Data da revisao: 2026-06-10
 Branch local revisada: `main`
 Reviewer documentado nas branches: `licori12`
 
@@ -86,6 +86,33 @@ Validacao:
 - `npm test --workspace frontend -- --run`: passou com 34 testes.
 - `npm run build --workspace frontend`: passou.
 
+### `feature-rate-limit`
+
+Status: feita e mergeada em `main`.
+
+Tasks concluidas:
+- Criar `backend/src/Support/RateLimit.php`.
+- Integrar rate limiting no login em `backend/src/Controllers/AuthController.php`.
+- Adicionar `Response::tooManyRequests()` com status 429.
+- Limitar login a 5 tentativas falhadas por 5 minutos por email.
+- Registrar log das tentativas bloqueadas.
+- Adicionar teste especifico para 5 falhas seguidas de 429 na 6a tentativa.
+
+Arquivos principais:
+- `backend/src/Support/RateLimit.php`
+- `backend/src/Controllers/AuthController.php`
+- `backend/src/Core/Response.php`
+- `backend/tests/smoke.sh`
+
+Validacao:
+- `php -l backend/src/Support/RateLimit.php`: passou.
+- `php -l backend/src/Controllers/AuthController.php`: passou.
+- `php -l backend/src/Core/Response.php`: passou.
+- `git diff --check -- backend/tests/smoke.sh`: passou.
+
+Observacao:
+- O smoke test completo nao foi executado nesta revisao local porque o ambiente Windows nao tem bash/WSL funcional e o Docker daemon nao esta rodando.
+
 ## Ajuste complementar
 
 ### Docker healthcheck do frontend
@@ -113,10 +140,16 @@ Validacao Docker:
 - Checagem proativa de expiracao do token no frontend.
 - Feedback offline/retry de rede.
 - Busca global na topbar.
+- Ligar ou remover botoes decorativos da topbar.
+- Externalizar identidade da filial.
 - Focus trap em modais.
 - `aria-live` em toasts/estados.
+- Loading state e prevencao de duplo-submit nos forms.
 - Paginacao backend/frontend.
-- Rate limiting no login.
+- Extrair helper reutilizavel de render de tabela.
+- Limpeza de wrappers sem uso em `api.js`.
+- CSS potencialmente nao usado.
+- Endpoints sem consumidor de UI.
 - Logging estruturado de erros.
 - Restringir CORS por configuracao.
 - Suite backend mais completa com PHPUnit.
