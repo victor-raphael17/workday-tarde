@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { toneClass, formatDate, initials, auth, ApiError } from './api.js';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { toneClass, formatDate, initials, auth, ApiError, api } from './api.js';
 
 describe('toneClass', () => {
   it('status-success para in', () => {
@@ -125,5 +125,64 @@ describe('auth', () => {
     localStorage.setItem('ca_pharmacy_session', 'invalid-json');
 
     expect(auth.session).toBeNull();
+  });
+});
+
+describe('api request parsing', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    sessionStorage.clear();
+    vi.unstubAllGlobals();
+  });
+
+  it('desempacota o envelope de sucesso', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => ({
+        ok: true,
+        status: 200,
+        json: async () => ({ data: { id: 1, name: 'Test' } }),
+      }))
+    );
+
+    await expect(api.medication(1)).resolves.toEqual({ id: 1, name: 'Test' });
+  });
+
+  it('lanca ApiError com status, mensagem e campos do envelope de erro', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => ({
+        ok: false,
+        status: 404,
+        json: async () => ({
+          error: {
+            status: 404,
+            message: 'Not found',
+            fields: { id: ['does not exist'] },
+          },
+        }),
+      }))
+    );
+
+    await expect(api.medication(99)).rejects.toMatchObject({
+      name: 'ApiError',
+      status: 404,
+      message: 'Not found',
+      fields: { id: ['does not exist'] },
+    });
+  });
+
+  it('lanca ApiError com status 0 em falha de rede', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        throw new Error('network fail');
+      })
+    );
+
+    await expect(api.medication(1)).rejects.toMatchObject({
+      name: 'ApiError',
+      status: 0,
+    });
   });
 });

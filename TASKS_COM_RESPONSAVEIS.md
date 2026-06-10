@@ -211,13 +211,18 @@ Atualizado conforme `main` em 2026-06-10.
     - padronizar JS.
     - preparar o projeto para CI.
 
-- [ ] **Completar cobertura de testes do frontend**
-  - Branch sugerida: `feature/frontend-api-tests`.
+- [x] **Completar cobertura de testes do frontend**
+  - Branch: `feat-frontend-api-test`.
   - Arquivo:
     - `frontend/assets/js/api.test.js`
   - Objetivo:
     - testar parsing do envelope de sucesso.
     - testar parsing de erro da API.
+    - testar falha de rede como `ApiError(0)`.
+  - Validacao:
+    - `npm test --workspace frontend -- --run`: 44 testes passaram.
+    - `npm run lint:check --workspace frontend`: passou.
+    - `npm run build --workspace frontend`: passou.
 
 ### Frontend Dev #2 - Joao B
 
@@ -358,5 +363,4 @@ Atualizado conforme `main` em 2026-06-10.
 4. Morozini: `feature/topbar-global-search`
 5. Frontend Dev #4: `feature/modal-focus-trap` + `feature/ui-aria-live`
 6. Backend Dev #2 / Frontend Dev #2: paginacao backend e depois frontend
-7. Frontend Dev #1: `feature/frontend-api-tests`
-8. Tech lead ou dupla Frontend Dev #1 + Backend Dev #5: `feature/ci-pipeline`
+7. Tech lead ou dupla Frontend Dev #1 + Backend Dev #5: `feature/ci-pipeline`
