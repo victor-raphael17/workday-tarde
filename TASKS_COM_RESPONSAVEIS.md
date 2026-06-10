@@ -167,12 +167,24 @@ Atualizado conforme `main` em 2026-06-10.
   - Objetivo:
     - registrar excecoes 500 com mensagem, exception e trace.
 
-- [ ] **Restringir CORS por configuracao**
-  - Branch sugerida: `feature/configurable-cors`.
-  - Arquivo:
+- [x] **Restringir CORS por configuracao**
+  - Branch: `feature/configurable-cors`.
+  - Arquivos:
+    - `backend/config/config.php`
     - `backend/src/Core/App.php`
+    - `backend/.env.example`
+    - `compose.yaml`
   - Objetivo:
     - trocar `Access-Control-Allow-Origin: *` por allowlist via env.
+    - usar `CORS_ALLOWED_ORIGINS` como configuracao documentada.
+  - Resultado:
+    - origens permitidas recebem `Access-Control-Allow-Origin`.
+    - origens nao permitidas nao recebem o header de liberacao.
+  - Validacao:
+    - origem permitida `http://localhost:4173`: header CORS retornado.
+    - origem nao permitida `http://evil.test`: header CORS omitido.
+    - preflight `OPTIONS`: 204 com header para origem permitida.
+    - `API=http://localhost:8080 bash backend/tests/smoke.sh`: 20 passed, 0 failed.
 
 - [ ] **Suite de testes automatizados no backend**
   - Branch sugerida: `feature/backend-tests`.
@@ -340,7 +352,7 @@ Atualizado conforme `main` em 2026-06-10.
 
 ## Ordem sugerida de execucao
 
-1. Gabriel Luis: `feature/backend-error-logging` ou `feature/configurable-cors`
+1. Gabriel Luis: `feature/backend-error-logging`
 2. Domareski: `feature/stock-adjustment-audit`
 3. Joao B: `feature/frontend-token-expiry`
 4. Morozini: `feature/topbar-global-search`

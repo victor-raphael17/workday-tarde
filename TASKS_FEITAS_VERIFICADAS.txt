@@ -178,5 +178,4 @@ Arquivos:
 - CSS potencialmente nao usado.
 - Endpoints sem consumidor de UI.
 - Logging estruturado de erros.
-- Restringir CORS por configuracao.
 - Suite backend mais completa com PHPUnit (o `composer.json` ja lista PHPUnit e ha `AuthMiddlewareTest`, mas falta uma suite abrangente para services/validator e execucao documentada).
