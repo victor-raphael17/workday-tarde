@@ -17,8 +17,7 @@ final class AuthMiddleware
 {
     public function __construct(
         private ?AuthServiceInterface $auth = null,
-    ) {
-    }
+    ) {}
 
     /**
      * Validate the bearer token in the request.
@@ -27,14 +26,17 @@ final class AuthMiddleware
     {
         $token = $request->bearerToken();
 
-        if (!$token) {
+        // Correção: Garante que o token não é nulo, não é vazio e remove espaços invisíveis
+        if ($token === null || trim($token) === '') {
             return Response::unauthorized(['message' => 'Missing or invalid Authorization header.']);
         }
 
         try {
             $user = $this->auth()->authenticate($token);
+            if (!$user) {
+                return Response::unauthorized(['message' => 'Invalid or expired token.']);
+            }
             $request->setUser($user);
-
             return null;
         } catch (Throwable $e) {
             return Response::unauthorized(['message' => $e->getMessage()]);
