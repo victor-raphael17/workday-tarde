@@ -146,26 +146,21 @@ Arquivos:
 - `PROJECT_CONTEXT.md`
 - `TASKS_COM_RESPONSAVEIS.md`
 
-### CORS configuravel por origem
+### Topbar global search e acoes
 
-Status: feito em `feature/configurable-cors`.
+Status: feito em `feature/topbar-global-actions`.
 
 Task/ajuste:
-- Trocar `Access-Control-Allow-Origin: *` por allowlist via env.
-- Configurar `CORS_ALLOWED_ORIGINS` no backend e no compose.
-- Retornar `Access-Control-Allow-Origin` somente para origens permitidas.
+- Implementar busca global da topbar para medicamentos, pacientes e prescricoes.
+- Ligar os botoes Notifications e Help, antes decorativos.
+- Adicionar testes unitarios para renderizacao e interacoes da topbar.
 
 Arquivos:
-- `backend/config/config.php`
-- `backend/src/Core/App.php`
-- `backend/.env.example`
-- `compose.yaml`
-
-Validacao:
-- Origem permitida `http://localhost:4173`: retornou `Access-Control-Allow-Origin: http://localhost:4173`.
-- Origem nao permitida `http://evil.test`: nao retornou `Access-Control-Allow-Origin`.
-- Preflight `OPTIONS` de origem permitida: retornou 204 com `Access-Control-Allow-Origin`.
-- `API=http://localhost:8080 bash backend/tests/smoke.sh`: 20 passed, 0 failed.
+- `frontend/assets/js/shell.js`
+- `frontend/assets/js/shell.test.js`
+- `frontend/assets/css/app.css`
+- `PROJECT_CONTEXT.md`
+- `TASKS_COM_RESPONSAVEIS.md`
 
 ## Ainda pendente
 
@@ -174,8 +169,6 @@ Validacao:
 - Resolver o parametro `reason` do ajuste de estoque.
 - Checagem proativa de expiracao do token no frontend.
 - Feedback offline/retry de rede.
-- Busca global na topbar.
-- Ligar ou remover botoes decorativos da topbar.
 - Externalizar identidade da filial.
 - Focus trap em modais.
 - `aria-live` em toasts/estados.
