@@ -14,7 +14,7 @@ Atualizado conforme `main` em 2026-06-10.
 | Frontend Dev #1 | Leonardo | Primeira task frontend pendente |
 | Frontend Dev #2 | Joao B | Segunda task frontend pendente |
 | Frontend Dev #3 | Morozini | Terceira task frontend pendente |
-| Frontend Dev #4 | A definir | Vitest + unit tests |
+| Frontend Dev #4 | A definir | Focus trap / aria-live / form loading |
 
 ## Ja entregue na branch atual
 
@@ -25,7 +25,7 @@ Atualizado conforme `main` em 2026-06-10.
 | `feature/frontend-tests-xss-clean` | Frontend Dev #4 - A definir | licori12 | Mergeado na `main`; testes/build validados |
 | `feature-add-eslint-and-prettier-configuration-with-documentation` | Frontend Dev #1 - Leonardo | licori12 | Mergeado na `main`; lint/test/build validados |
 | `backend-dev-2-auth-router` | Backend Dev #2 - Domareski | licori12 | Mergeado na `main`; backend/auth, lint/test/build validados |
-| `feature-rate-limit` | Backend Dev #5 - Gabriel Luis | licori12 | Mergeado na `main`; rate limiting implementado e teste smoke especifico adicionado |
+| `feature-rate-limit` | Backend Dev #5 - Gabriel Luis | licori12 | Mergeado na `main`; rate limiting implementado e smoke 20/20 com 429 validado |
 
 ### Backend Dev #1 - Nicolas
 
@@ -59,6 +59,7 @@ Atualizado conforme `main` em 2026-06-10.
     - 6a tentativa falhada retorna 429.
     - tentativas bloqueadas geram log.
     - `Response::tooManyRequests()` foi adicionado.
+    - `backend/tests/smoke.sh` cobre 5 tentativas invalidas com 401 e a 6a com 429.
 
 ### Frontend Dev #4 - A definir
 
@@ -155,6 +156,9 @@ Atualizado conforme `main` em 2026-06-10.
   - Objetivo:
     - limitar tentativas por email.
     - responder 429 ao estourar limite.
+    - manter cobertura no smoke test para 5 falhas seguidas de 429 na 6a tentativa.
+  - Validacao:
+    - `API=http://localhost:8080 bash backend/tests/smoke.sh`: 20 passed, 0 failed.
 
 - [ ] **Logging estruturado de erros**
   - Branch sugerida: `feature/backend-error-logging`.
@@ -176,8 +180,9 @@ Atualizado conforme `main` em 2026-06-10.
     - `backend/composer.json`
     - `backend/tests/`
   - Objetivo:
-    - adicionar PHPUnit.
+    - expandir a suite PHPUnit ja configurada no `composer.json`.
     - cobrir `AuthService`, `MedicationService` e `Validator`.
+    - documentar a execucao dos testes backend.
 
 ## Frontend
 

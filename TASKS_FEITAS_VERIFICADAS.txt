@@ -96,7 +96,7 @@ Tasks concluidas:
 - Adicionar `Response::tooManyRequests()` com status 429.
 - Limitar login a 5 tentativas falhadas por 5 minutos por email.
 - Registrar log das tentativas bloqueadas.
-- Adicionar teste especifico para 5 falhas seguidas de 429 na 6a tentativa.
+- Adicionar teste smoke especifico para 5 falhas seguidas de 429 na 6a tentativa.
 
 Arquivos principais:
 - `backend/src/Support/RateLimit.php`
@@ -108,10 +108,8 @@ Validacao:
 - `php -l backend/src/Support/RateLimit.php`: passou.
 - `php -l backend/src/Controllers/AuthController.php`: passou.
 - `php -l backend/src/Core/Response.php`: passou.
+- `API=http://localhost:8080 bash backend/tests/smoke.sh`: passou; cobre 5 tentativas invalidas com 401 e a 6a com 429.
 - `git diff --check -- backend/tests/smoke.sh`: passou.
-
-Observacao:
-- O smoke test completo nao foi executado nesta revisao local porque o ambiente Windows nao tem bash/WSL funcional e o Docker daemon nao esta rodando.
 
 ## Ajuste complementar
 
@@ -130,7 +128,7 @@ Validacao Docker:
 - `docker compose ps`: `db` healthy, `api` up, `web` healthy.
 - `curl http://localhost:8080/health`: API healthy.
 - `curl http://localhost:4173/`: HTTP 200.
-- `API=http://localhost:8080 bash backend/tests/smoke.sh`: 14 passed, 0 failed.
+- `API=http://localhost:8080 bash backend/tests/smoke.sh`: 20 passed, 0 failed.
 
 ## Ainda pendente
 
@@ -152,4 +150,4 @@ Validacao Docker:
 - Endpoints sem consumidor de UI.
 - Logging estruturado de erros.
 - Restringir CORS por configuracao.
-- Suite backend mais completa com PHPUnit.
+- Suite backend mais completa com PHPUnit (o `composer.json` ja lista PHPUnit e ha `AuthMiddlewareTest`, mas falta uma suite abrangente para services/validator e execucao documentada).

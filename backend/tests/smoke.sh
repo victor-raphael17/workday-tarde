@@ -89,6 +89,17 @@ echo "== Authentication: login, me, logout =="
 # Wrong password is rejected (401).
 assert_eq "bad credentials return 401" "401" \
   "$(status_code POST /api/auth/login '{"email":"jade@capharmacy.com","password":"nope"}')"
+
+echo "== Authentication: login rate limit =="
+RATE_LIMIT_EMAIL="smoke-rate-limit-$(date +%s)-$$@example.test"
+RATE_LIMIT_BODY="{\"email\":\"$RATE_LIMIT_EMAIL\",\"password\":\"wrong-password\"}"
+for attempt in 1 2 3 4 5; do
+  assert_eq "failed login attempt $attempt returns 401" "401" \
+    "$(status_code POST /api/auth/login "$RATE_LIMIT_BODY")"
+done
+assert_eq "6th failed login attempt returns 429" "429" \
+  "$(status_code POST /api/auth/login "$RATE_LIMIT_BODY")"
+
 # Valid sign-in issues a bearer token.
 TOKEN=$(curl -s -X POST "$API/api/auth/login" -H 'Content-Type: application/json' \
   -d '{"email":"jade@capharmacy.com","password":"password123"}' | json_get 'data.token')
