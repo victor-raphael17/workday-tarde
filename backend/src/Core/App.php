@@ -57,6 +57,8 @@ final class App
 
     private function serverError(Throwable $e): Response
     {
+        $this->logInternalError($e);
+
         $debug = (bool) Config::get('app.debug', false);
 
         $message = $debug ? $e->getMessage() : 'An unexpected error occurred.';
@@ -68,6 +70,19 @@ final class App
         }
 
         return $response;
+    }
+
+    private function logInternalError(Throwable $e): void
+    {
+        error_log(json_encode([
+            'timestamp' => (new \DateTimeImmutable())->format(DATE_ATOM),
+            'level' => 'error',
+            'message' => $e->getMessage(),
+            'exception' => $e::class,
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => explode("\n", $e->getTraceAsString()),
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     }
 
     private function handleCors(Request $request): void

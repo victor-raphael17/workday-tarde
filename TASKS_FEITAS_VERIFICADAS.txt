@@ -196,6 +196,26 @@ Validacao/conclusao:
 - `npm run lint:check --workspace frontend`: passou.
 - `npm run build --workspace frontend`: passou.
 
+### Logging estruturado de erros
+
+Status: feito em `feature/backend-error-logging`.
+
+Task/ajuste:
+- Registrar excecoes internas 500 em formato JSON estruturado.
+- Preservar a resposta HTTP 500 existente, incluindo detalhes somente quando `APP_DEBUG=true`.
+
+Arquivo:
+- `backend/src/Core/App.php`
+
+Dados registrados:
+- `timestamp`
+- `level`
+- `message`
+- `exception`
+- `file`
+- `line`
+- `trace`
+
 ## Ainda pendente
 
 - Pipeline de CI.
@@ -209,5 +229,4 @@ Validacao/conclusao:
 - Paginacao backend/frontend.
 - Limpeza de wrappers sem uso em `api.js`.
 - Endpoints sem consumidor de UI.
-- Logging estruturado de erros.
 - Suite backend mais completa com PHPUnit (o `composer.json` ja lista PHPUnit e ha `AuthMiddlewareTest`, mas falta uma suite abrangente para services/validator e execucao documentada).

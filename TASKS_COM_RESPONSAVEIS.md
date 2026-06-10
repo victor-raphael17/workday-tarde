@@ -160,12 +160,23 @@ Atualizado conforme `main` em 2026-06-10.
   - Validacao:
     - `API=http://localhost:8080 bash backend/tests/smoke.sh`: 20 passed, 0 failed.
 
-- [ ] **Logging estruturado de erros**
-  - Branch sugerida: `feature/backend-error-logging`.
+- [x] **Logging estruturado de erros**
+  - Branch: `feature/backend-error-logging`.
   - Arquivo:
     - `backend/src/Core/App.php`
   - Objetivo:
     - registrar excecoes 500 com mensagem, exception e trace.
+  - Resultado:
+    - erros internos sao registrados via `error_log()` como JSON estruturado.
+    - resposta 500 existente foi preservada.
+  - Campos registrados:
+    - `timestamp`
+    - `level`
+    - `message`
+    - `exception`
+    - `file`
+    - `line`
+    - `trace`
 
 - [x] **Restringir CORS por configuracao**
   - Branch: `feature/configurable-cors`.
@@ -366,10 +377,9 @@ Atualizado conforme `main` em 2026-06-10.
 
 ## Ordem sugerida de execucao
 
-1. Gabriel Luis: `feature/backend-error-logging`
-2. Domareski: `feature/stock-adjustment-audit`
-3. Joao B: `feature/frontend-token-expiry`
-4. Morozini: `feature/topbar-global-search`
-5. Frontend Dev #4: `feature/modal-focus-trap` + `feature/ui-aria-live`
-6. Backend Dev #2 / Frontend Dev #2: paginacao backend e depois frontend
-7. Tech lead ou dupla Frontend Dev #1 + Backend Dev #5: `feature/ci-pipeline`
+1. Domareski: `feature/stock-adjustment-audit`
+2. Joao B: `feature/frontend-token-expiry`
+3. Morozini: `feature/topbar-global-search`
+4. Frontend Dev #4: `feature/modal-focus-trap` + `feature/ui-aria-live`
+5. Backend Dev #2 / Frontend Dev #2: paginacao backend e depois frontend
+6. Tech lead ou dupla Frontend Dev #1 + Backend Dev #5: `feature/ci-pipeline`
