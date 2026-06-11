@@ -1,4 +1,4 @@
-import { api, auth } from './api.js';
+import { ApiError, api, auth } from './api.js';
 import { bindPageBehaviors } from './page-behaviors.js';
 import { bindShellEvents, loadNavCounts, renderShell } from './shell.js';
 
@@ -24,10 +24,12 @@ async function bootstrap() {
 
   try {
     await api.me();
-  } catch {
-    auth.clear();
-    auth.redirectToLogin();
-    return;
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 401) {
+      auth.clear();
+      auth.redirectToLogin();
+      return;
+    }
   }
 
   renderShell(pageId);

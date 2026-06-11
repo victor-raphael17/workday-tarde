@@ -253,10 +253,22 @@ Arquivos:
 - `backend/src/Repositories/StockMovementRepository.php`
 - `backend/src/Services/MedicationService.php`
 
+### Checagem proativa de expiracao do token
+
+Status: feito em `checktoken`.
+
+Task/ajuste:
+- Validar `expires_at` no bootstrap das paginas autenticadas.
+- Redirecionar para login antes de renderizar a pagina quando a sessao local estiver expirada.
+- Validar a sessao com `api.me()` quando houver token armazenado.
+- Evitar limpar a sessao em falha temporaria de rede; logout automatico fica restrito a token ausente, expirado ou rejeitado com 401.
+
+Arquivo:
+- `frontend/assets/js/main.js`
+
 ## Ainda pendente
 
 - Pipeline de CI.
-- Checagem proativa de expiracao do token no frontend.
 - Feedback offline/retry de rede.
 - Externalizar identidade da filial.
 - Focus trap em modais.
