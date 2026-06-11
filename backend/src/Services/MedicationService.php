@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Core\Exceptions\DomainException;
 use App\Core\Exceptions\NotFoundException;
 use App\Repositories\MedicationRepository;
+use App\Repositories\StockMovementRepository;
 
 /**
  * Business logic for the medication catalogue and stock control.
@@ -23,6 +24,7 @@ final class MedicationService
 
     public function __construct(
         private readonly MedicationRepository $medications = new MedicationRepository(),
+        private readonly StockMovementRepository $stockMovements = new StockMovementRepository(),
     ) {
     }
 
@@ -120,6 +122,12 @@ final class MedicationService
         if ($updated === null) {
             throw new DomainException('Adjustment rejected: stock cannot go below zero.');
         }
+
+        $this->stockMovements->create(
+            $id,
+            $delta,
+            $reason
+        );
 
         return $this->present($updated);
     }

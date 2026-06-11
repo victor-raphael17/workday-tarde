@@ -2,14 +2,14 @@
 
 Baseado no `TASKS.md`, no guia colado para **Backend Dev #1** e na divisao de devs informada.
 
-Atualizado conforme `main` em 2026-06-10.
+Atualizado conforme `main` em 2026-06-11.
 
 ## Mapa de responsaveis
 
 | Papel | Responsavel | Foco |
 | --- | --- | --- |
 | Backend Dev #1 | Nicolas | Auth middleware / proteger rotas autenticadas |
-| Backend Dev #2 | Domareski | Proxima task backend dependente do auth |
+| Backend Dev #2 | Domareski | Auditoria de ajuste de estoque concluida / paginacao backend |
 | Backend Dev #5 | Gabriel Luis | Rate limiting concluido / melhorias backend restantes |
 | Frontend Dev #1 | Leonardo | Primeira task frontend pendente |
 | Frontend Dev #2 | Joao B | Segunda task frontend pendente |
@@ -26,6 +26,8 @@ Atualizado conforme `main` em 2026-06-10.
 | `feature-add-eslint-and-prettier-configuration-with-documentation` | Frontend Dev #1 - Leonardo | licori12 | Mergeado na `main`; lint/test/build validados |
 | `backend-dev-2-auth-router` | Backend Dev #2 - Domareski | licori12 | Mergeado na `main`; backend/auth, lint/test/build validados |
 | `feature-rate-limit` | Backend Dev #5 - Gabriel Luis | licori12 | Mergeado na `main`; rate limiting implementado e smoke 20/20 com 429 validado |
+| `feature/configurable-cors` | Backend Dev #5 - Gabriel Luis | licori12 | Mergeado na `main`; CORS por allowlist validado |
+| `feature/stock-adjustment-audit` | Backend Dev #2 - Domareski | licori12 | Mergeado na `main`; audit log de ajuste de estoque implementado |
 
 ### Backend Dev #1 - Nicolas
 
@@ -120,18 +122,16 @@ Atualizado conforme `main` em 2026-06-10.
 
 ### Backend Dev #2 - Domareski
 
-- [ ] **Resolver o parametro `reason` do ajuste de estoque**
-  - Branch sugerida: `feature/stock-adjustment-audit`.
+- [x] **Resolver o parametro `reason` do ajuste de estoque**
+  - Branch integrada: `feature/stock-adjustment-audit`.
   - Arquivos envolvidos:
-    - `frontend/assets/js/page-behaviors.js`
-    - `frontend/assets/js/api.js`
-    - `backend/src/Controllers/MedicationController.php`
+    - `backend/database/schema.sql`
+    - `backend/src/Repositories/StockMovementRepository.php`
     - `backend/src/Services/MedicationService.php`
-  - Decisao tecnica:
-    - implementar audit log de movimentacao de estoque; ou
-    - remover `reason` de ponta a ponta.
-  - Recomendacao:
-    - implementar audit log, porque o motivo do ajuste e informacao util para farmacia.
+  - Resultado:
+    - foi implementado audit log de movimentacao de estoque.
+    - `stock_movements` registra medicamento, delta, motivo e data do ajuste.
+    - `MedicationService::adjustStock()` persiste o `reason` recebido.
 
 - [ ] **Paginacao nos endpoints de listagem**
   - Branch sugerida: `feature/backend-pagination`.
@@ -160,12 +160,23 @@ Atualizado conforme `main` em 2026-06-10.
   - Validacao:
     - `API=http://localhost:8080 bash backend/tests/smoke.sh`: 20 passed, 0 failed.
 
-- [ ] **Logging estruturado de erros**
-  - Branch sugerida: `feature/backend-error-logging`.
+- [x] **Logging estruturado de erros**
+  - Branch: `feature/backend-error-logging`.
   - Arquivo:
     - `backend/src/Core/App.php`
   - Objetivo:
     - registrar excecoes 500 com mensagem, exception e trace.
+  - Resultado:
+    - erros internos sao registrados via `error_log()` como JSON estruturado.
+    - resposta 500 existente foi preservada.
+  - Campos registrados:
+    - `timestamp`
+    - `level`
+    - `message`
+    - `exception`
+    - `file`
+    - `line`
+    - `trace`
 
 - [x] **Restringir CORS por configuracao**
   - Branch: `feature/configurable-cors`.
@@ -366,10 +377,8 @@ Atualizado conforme `main` em 2026-06-10.
 
 ## Ordem sugerida de execucao
 
-1. Gabriel Luis: `feature/backend-error-logging`
-2. Domareski: `feature/stock-adjustment-audit`
-3. Joao B: `feature/frontend-token-expiry`
-4. Morozini: `feature/topbar-global-search`
-5. Frontend Dev #4: `feature/modal-focus-trap` + `feature/ui-aria-live`
-6. Backend Dev #2 / Frontend Dev #2: paginacao backend e depois frontend
-7. Tech lead ou dupla Frontend Dev #1 + Backend Dev #5: `feature/ci-pipeline`
+1. Joao B: `feature/frontend-token-expiry`
+2. Frontend Dev #4: `feature/modal-focus-trap` + `feature/ui-aria-live`
+3. Backend Dev #2 / Frontend Dev #2: paginacao backend e depois frontend
+4. Frontend Dev #2: `feature/frontend-network-retry`
+5. Tech lead ou dupla Frontend Dev #1 + Backend Dev #5: `feature/ci-pipeline`
