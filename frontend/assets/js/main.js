@@ -1,19 +1,43 @@
-import { auth } from './api.js';
+import { api, auth } from './api.js';
 import { bindPageBehaviors } from './page-behaviors.js';
 import { bindShellEvents, loadNavCounts, renderShell } from './shell.js';
 
 const pageId = document.body.dataset.page || 'dashboard';
 
-// Route guard: every page that loads the shell requires a session.
-if (!auth.token) {
-  auth.redirectToLogin();
+async function bootstrap() {
+  if (!auth.token) {
+    auth.redirectToLogin();
+    return;
+  }
+
+  const expiresAt = auth.session?.expires_at;
+
+  if (expiresAt) {
+    const expiresTime = new Date(expiresAt).getTime();
+
+    if (!Number.isNaN(expiresTime) && Date.now() >= expiresTime) {
+      auth.clear();
+      auth.redirectToLogin();
+      return;
+    }
+  }
+
+  try {
+    await api.me();
+  } catch {
+    auth.clear();
+    auth.redirectToLogin();
+    return;
+  }
+
+  renderShell(pageId);
+  bindShellEvents();
+  loadNavCounts();
+  bindPageBehaviors(pageId);
+
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
 }
 
-renderShell(pageId);
-bindShellEvents();
-loadNavCounts();
-bindPageBehaviors(pageId);
-
-if (window.lucide) {
-  window.lucide.createIcons();
-}
+bootstrap();
