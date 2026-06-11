@@ -12,7 +12,7 @@ Atualizado conforme `main` em 2026-06-11.
 | Backend Dev #2 | Domareski | Auditoria de ajuste de estoque concluida / paginacao backend |
 | Backend Dev #5 | Gabriel Luis | Rate limiting concluido / melhorias backend restantes |
 | Frontend Dev #1 | Leonardo | Primeira task frontend pendente |
-| Frontend Dev #2 | Joao B | Segunda task frontend pendente |
+| Frontend Dev #2 | Joao B | Expiracao de token concluida / retry de rede |
 | Frontend Dev #3 | Morozini | Terceira task frontend pendente |
 | Frontend Dev #4 | A definir | Focus trap / aria-live / form loading |
 
@@ -28,6 +28,7 @@ Atualizado conforme `main` em 2026-06-11.
 | `feature-rate-limit` | Backend Dev #5 - Gabriel Luis | licori12 | Mergeado na `main`; rate limiting implementado e smoke 20/20 com 429 validado |
 | `feature/configurable-cors` | Backend Dev #5 - Gabriel Luis | licori12 | Mergeado na `main`; CORS por allowlist validado |
 | `feature/stock-adjustment-audit` | Backend Dev #2 - Domareski | licori12 | Mergeado na `main`; audit log de ajuste de estoque implementado |
+| `checktoken` | Frontend Dev #2 - Joao B | licori12 | Pronto para merge; checagem proativa de expiracao do token implementada |
 
 ### Backend Dev #1 - Nicolas
 
@@ -237,15 +238,15 @@ Atualizado conforme `main` em 2026-06-11.
 
 ### Frontend Dev #2 - Joao B
 
-- [ ] **Checar expiracao do token proativamente**
-  - Branch sugerida: `feature/frontend-token-expiry`.
+- [x] **Checar expiracao do token proativamente**
+  - Branch: `checktoken`.
   - Arquivos:
-    - `frontend/assets/js/api.js`
     - `frontend/assets/js/main.js`
-  - Objetivo:
-    - usar `expires_at`.
-    - chamar `api.me()` quando fizer sentido.
-    - redirecionar antes de uma requisicao falhar.
+  - Resultado:
+    - usa `expires_at` para bloquear sessao local expirada antes da renderizacao.
+    - chama `api.me()` para validar token armazenado.
+    - redireciona quando o token esta ausente, expirado ou rejeitado com 401.
+    - nao limpa sessao em falha temporaria de rede.
 
 - [ ] **Feedback de offline / retry de rede**
   - Branch sugerida: `feature/frontend-network-retry`.
@@ -377,8 +378,7 @@ Atualizado conforme `main` em 2026-06-11.
 
 ## Ordem sugerida de execucao
 
-1. Joao B: `feature/frontend-token-expiry`
-2. Frontend Dev #4: `feature/modal-focus-trap` + `feature/ui-aria-live`
-3. Backend Dev #2 / Frontend Dev #2: paginacao backend e depois frontend
-4. Frontend Dev #2: `feature/frontend-network-retry`
-5. Tech lead ou dupla Frontend Dev #1 + Backend Dev #5: `feature/ci-pipeline`
+1. Frontend Dev #4: `feature/modal-focus-trap` + `feature/ui-aria-live`
+2. Backend Dev #2 / Frontend Dev #2: paginacao backend e depois frontend
+3. Frontend Dev #2: `feature/frontend-network-retry`
+4. Tech lead ou dupla Frontend Dev #1 + Backend Dev #5: `feature/ci-pipeline`
