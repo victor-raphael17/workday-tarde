@@ -1,6 +1,6 @@
 # Tasks feitas e verificadas
 
-Data da revisao: 2026-06-10
+Data da revisao: 2026-06-11
 Branch local revisada: `main`
 Reviewer documentado nas branches: `licori12`
 
@@ -216,10 +216,46 @@ Dados registrados:
 - `line`
 - `trace`
 
+### CORS configuravel por allowlist
+
+Status: feito em `feature/configurable-cors`.
+
+Task/ajuste:
+- Restringir CORS por configuracao em vez de liberar todas as origens com `*`.
+- Adicionar `CORS_ALLOWED_ORIGINS` na configuracao e no compose local.
+- Retornar `Access-Control-Allow-Origin` apenas para origens permitidas.
+
+Arquivos:
+- `backend/config/config.php`
+- `backend/src/Core/App.php`
+- `backend/.env.example`
+- `compose.yaml`
+- `TASKS_COM_RESPONSAVEIS.md`
+- `TASKS_FEITAS_VERIFICADAS.txt`
+
+Validacao registrada:
+- Origem permitida `http://localhost:4173`: header CORS retornado.
+- Origem nao permitida `http://evil.test`: header CORS omitido.
+- Preflight `OPTIONS`: 204 com header para origem permitida.
+- `API=http://localhost:8080 bash backend/tests/smoke.sh`: 20 passed, 0 failed.
+
+### Auditoria do motivo de ajuste de estoque
+
+Status: feito em `feature/stock-adjustment-audit`.
+
+Task/ajuste:
+- Resolver o parametro `reason` do ajuste de estoque implementando audit log de movimentacao.
+- Criar tabela `stock_movements` para registrar medicamento, delta, motivo e data.
+- Persistir o motivo recebido por `MedicationService::adjustStock()`.
+
+Arquivos:
+- `backend/database/schema.sql`
+- `backend/src/Repositories/StockMovementRepository.php`
+- `backend/src/Services/MedicationService.php`
+
 ## Ainda pendente
 
 - Pipeline de CI.
-- Resolver o parametro `reason` do ajuste de estoque.
 - Checagem proativa de expiracao do token no frontend.
 - Feedback offline/retry de rede.
 - Externalizar identidade da filial.
